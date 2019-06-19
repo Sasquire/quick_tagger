@@ -34,7 +34,7 @@ const utils = {
 		btn.addEventListener('click', () => {
 			if(utils.waiting_for_setting){ return; } // Don't set multiple at once
 			$l(`Waiting for keypress to assign to ${id}`);
-			set_keycode('<waiting>');
+			set_keycode('<press a key>');
 			btn.blur(); // Allows for arrow keys
 			document.body.addEventListener('keydown', watch_key_press);
 

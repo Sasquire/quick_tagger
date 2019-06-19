@@ -14,11 +14,9 @@ apply tags on post load
 
 get flash to work correctly
   I didn't find it worth my time to get it working well
+  also do it for webm
 
 allow blacklist
   I figure if you want to use this, you don't care about blacklist
   but someone will want this feature, because i hope this
   tool doesnt fall into obscurity
-
-update post navigation
-  automatically scroll the thing when new posts are loaded

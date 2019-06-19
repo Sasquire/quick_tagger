@@ -63,7 +63,7 @@ const rules = {
 				<button
 					id="rule_${rule_count}_keycode"
 					class="setting_button"
-				>?</button>
+				>unbound</button>
 			</div>
 		`));
 

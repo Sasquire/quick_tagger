@@ -67,9 +67,9 @@ const settings = {
 		} else {
 			$l('Setting settings to default');
 			settings.set({
-				submit: '?',
-				next: '?',
-				previous: '?',
+				submit: 'unbound',
+				next: 'unbound',
+				previous: 'unbound',
 				query: '',
 				rules: []
 			});

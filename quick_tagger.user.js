@@ -47,14 +47,12 @@
 // 
 // get flash to work correctly
 //   I didn't find it worth my time to get it working well
+//   also do it for webm
 // 
 // allow blacklist
 //   I figure if you want to use this, you don't care about blacklist
 //   but someone will want this feature, because i hope this
 //   tool doesnt fall into obscurity
-// 
-// update post navigation
-//   automatically scroll the thing when new posts are loaded
 
 // Getting elements, used because they get lengthy
 function $d(id, node = document){
@@ -260,9 +258,9 @@ const settings = {
 		} else {
 			$l('Setting settings to default');
 			settings.set({
-				submit: '?',
-				next: '?',
-				previous: '?',
+				submit: 'unbound',
+				next: 'unbound',
+				previous: 'unbound',
 				query: '',
 				rules: []
 			});
@@ -414,7 +412,7 @@ const utils = {
 		btn.addEventListener('click', () => {
 			if(utils.waiting_for_setting){ return; } // Don't set multiple at once
 			$l(`Waiting for keypress to assign to ${id}`);
-			set_keycode('<waiting>');
+			set_keycode('<press a key>');
 			btn.blur(); // Allows for arrow keys
 			document.body.addEventListener('keydown', watch_key_press);
 
@@ -514,7 +512,7 @@ const rules = {
 				<button
 					id="rule_${rule_count}_keycode"
 					class="setting_button"
-				>?</button>
+				>unbound</button>
 			</div>
 		`));
 
@@ -927,13 +925,13 @@ document.body.innerHTML = `<div id="main">
 		<div class="nav_buttons">
 			<div>
 				<button id="previous_button">Previous Post</button>
-				<button id="previous_button_keycode" class="setting_button">?</button>
+				<button id="previous_button_keycode" class="setting_button">unbound</button>
 			</div><div>
 				<button id="submit_button">Submit</button>
-				<button id="submit_button_keycode" class="setting_button">?</button>
+				<button id="submit_button_keycode" class="setting_button">unbound</button>
 			</div><div>
 				<button id="next_button">Next Post</button>
-				<button id="next_button_keycode" class="setting_button">?</button>
+				<button id="next_button_keycode" class="setting_button">unbound</button>
 			</div>
 		</div>
 		<div>
