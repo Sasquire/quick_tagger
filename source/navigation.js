@@ -18,9 +18,7 @@ const navigation = {
 			api.index = 0;
 			$l('No more posts to load. We are at the start.');
 		} else {
-			// Update UI
 			navigation.switch_to_post(api.current_id());
-			rules.rules_off();
 		}
 	},
 
@@ -32,9 +30,7 @@ const navigation = {
 			api.index = api.posts.length - 1;
 			$l('No more posts to load, some should load soon');
 		} else {
-			// Update UI
 			navigation.switch_to_post(api.current_id());
-			rules.rules_off();
 		}
 	},
 
@@ -50,6 +46,8 @@ const navigation = {
 		}
 		$d(`post_${post_id}`).setAttribute('data-visited', true);
 
+		rules.rules_off();
+
 		api.display_image(post.file_ext, post.file_url, post.sample_url);
 
 		// If there are not enough images after this one get more
@@ -58,7 +56,7 @@ const navigation = {
 		}
 
 		// Scroll the scrollbar to this post
-		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop - 75;
+		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop - 80;
 		return undefined;
 	}
 };

@@ -136,6 +136,7 @@ const local = {
 			local.set(all_settings);
 
 			$e(`Settings saved as ${name}`);
+			settings.fill_selector();
 		}
 	},
 
@@ -159,6 +160,7 @@ const local = {
 			local.set(all_settings);
 
 			$e(`Setting named ${name} deleted`);
+			settings.fill_selector();
 		}
 	},
 
@@ -315,7 +317,6 @@ const navigation = {
 
 		const post_id = api.current_id();
 		const { to_add, to_del } = rules.tag_changes();
-		console.log(rules.tag_changes())
 		await api.edit_tags(post_id, to_add, to_del);
 
 		navigation.next();
@@ -329,9 +330,7 @@ const navigation = {
 			api.index = 0;
 			$l('No more posts to load. We are at the start.');
 		} else {
-			// Update UI
 			navigation.switch_to_post(api.current_id());
-			rules.rules_off();
 		}
 	},
 
@@ -343,9 +342,7 @@ const navigation = {
 			api.index = api.posts.length - 1;
 			$l('No more posts to load, some should load soon');
 		} else {
-			// Update UI
 			navigation.switch_to_post(api.current_id());
-			rules.rules_off();
 		}
 	},
 
@@ -361,6 +358,8 @@ const navigation = {
 		}
 		$d(`post_${post_id}`).setAttribute('data-visited', true);
 
+		rules.rules_off();
+
 		api.display_image(post.file_ext, post.file_url, post.sample_url);
 
 		// If there are not enough images after this one get more
@@ -369,7 +368,7 @@ const navigation = {
 		}
 
 		// Scroll the scrollbar to this post
-		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop - 75;
+		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop - 80;
 		return undefined;
 	}
 };
@@ -741,64 +740,111 @@ const api = {
 	remove_toJSON();
 })();
 
-GM_addStyle(`body, body > * {
+GM_addStyle(`:root {
+	--dark-blue: #031131;
+	--blue: #284a81;
+	--other-blue: #174891;
+	--more-blue: #152f56;
+
+	--yellow: #fdba31;
+	--light-yellow: #ffde9b;
+	--dark-yellow: #d8b162;
+}
+
+body, body > * {
 	padding: 0px;
 	margin: 0px;
 }
+
+/* 
+
+Stuff for the main setup
+
+*/
 #main {
 	height: 100vh;
 	display: grid;
 	grid-template-columns: 190px auto 200px;
 	grid-template-rows: 75px auto;
 }
-#navigation {
-	grid-column: 1 / 1;
-	grid-row: 2 / 3;
-	background-color:red;
-	overflow-y: scroll;
-	overflow-x: hidden;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
+
 #settings {
 	grid-column: 1 / 4;
 	grid-row: 1 / 1;
 	display: flex;
 	justify-content: space-between;
-	background-color:green;
-}
-#image {
-	grid-column: 2 / 2;
-	grid-row: 2 / 3;
-	background-color:blue;
+
+	background-color: var(--dark-blue);
+	color: white;
 }
 
-#setting_option { margin-right: 3em; }
-#settings > * { margin-right: auto; }
+#navigation {
+	grid-column: 1 / 1;
+	grid-row: 2 / 3;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	background-color: var(--more-blue);
+}
 
 #tags {
 	grid-column: 3 / 3;
 	grid-row: 2 / 3;
 	display: flex;
 	flex-direction: column;
-	background-color:orange;
+	
+	background-color: var(--more-blue);
 }
+
+#image {
+	grid-column: 2 / 2;
+	grid-row: 2 / 3;
+	background-color: var(--blue);
+}
+
+
+
+/* Stuff for buttons */
+button {
+	border: none;
+	border-radius: 0.1rem;
+}
+
+.setting_button {
+	border: none;
+	border-radius: 0.3rem;
+	background-color: var(--yellow);
+}
+
+
+
+/* Margin for the setting selector */
+#setting_option { margin-right: 3em; }
+#settings > * { margin-right: auto; }
+
+
+/* tag_rule settings */
 .tag_rule {
 	padding: 10px 0px;
 	display: flex;
 }
 #add_blank_rule { margin-bottom: 10px; }
 .tag_rule > .rule_tags { width: 0px; flex-grow: 1; }
-.tag_rule[data-activated=true] { background-color: red; }
+.tag_rule[data-activated=true] { background-color: var(--dark-yellow); }
 
 
 #search {
 	align-self: baseline;
 	width: 95%;
 }
+
+
+/* minipost settings */
 .post {
-	 border: 1px solid black;
+	 border: 1px solid white;
 	 padding: 0.25rem;
 	 margin: 0.25rem;
 	 width: 90%;
@@ -806,8 +852,15 @@ GM_addStyle(`body, body > * {
 	 flex-direction: column;
 }
 .post > img { align-self: center; }
-.post, .post > a, .post > a:visited { color: blue; }
-.post[data-visited=true] { background-color: orange; }
+.post[data-visited=true] { background-color: var(--yellow); }
+.post, .post a:visited, .post a {
+	text-shadow:
+		1px 1px #000,
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000;
+	color: white;
+}
 
 #image {
 	display:flex;
@@ -819,12 +872,6 @@ GM_addStyle(`body, body > * {
 	align-self: center;
 }
 
-.setting_button {
-	background-color: lightcyan;
-	border: none;
-	border-radius: 0.3rem;
-	color: darkblue;
-}
 .rule_tags {
 	border: none;
 	background-color: #fff8;
@@ -857,7 +904,7 @@ document.body.innerHTML = `<div id="main">
 			<div id="setting_save">
 				<button id="save_settings">Save</button>
 				<button id="delete_settings">Delete</button>
-				<span>setting named</span>
+				<span>setting called</span>
 				<input id="settings_name" placeholder="settings name"></input>
 			</div>
 			<div id="setting_userinfo">

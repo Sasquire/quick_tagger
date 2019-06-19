@@ -52,6 +52,7 @@ const local = {
 			local.set(all_settings);
 
 			$e(`Settings saved as ${name}`);
+			settings.fill_selector();
 		}
 	},
 
@@ -75,6 +76,7 @@ const local = {
 			local.set(all_settings);
 
 			$e(`Setting named ${name} deleted`);
+			settings.fill_selector();
 		}
 	},
 

@@ -22,7 +22,3 @@ allow blacklist
 
 update post navigation
   automatically scroll the thing when new posts are loaded
-
-actually have pretty css
-  I don't into colors, so make a nice grayscale one
-  Just change all my bad decisions into good ones
