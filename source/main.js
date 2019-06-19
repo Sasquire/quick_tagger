@@ -1,82 +1,3 @@
-function init(){
-	// Add event listener to id with action and function
-	const $ = (id, action, func) => {
-		let node = document.body;
-		if(id != undefined){
-			node = document.getElementById(id);
-		}
-		node.addEventListener(action, func);
-	};
-
-	// Drop-down menu to switch between functions
-	$('setting_option', 'change', change_setting_menu);
-	change_setting_menu(); // Run the command once to init
-
-	$('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
-
-	$(undefined, 'keydown', handle_key_press); // Watch for hotkey press
-
-	// Allow clicking buttons to submit, next, and previous
-	$('submit_button', 'click', navigation.submit);
-	$('next_button', 'click', navigation.next);
-	$('previous_button', 'click', navigation.previous);
-	// Turn the buttons into setting listeners
-	['submit', 'next', 'previous']
-		.map(e => `${e}_button_keycode`)
-		.forEach(utils.setting_listener);
-
-	settings.fill_selector(); // Load settings from memory and display
-	$('previous_settings', 'change', settings.update_selector); // Watch for update
-
-	// update userinfo button
-	$('update_userinfo', 'click', local.save_userinfo);
-
-	// Handle importing saving of settings
-	$('save_settings', 'click', local.save_current);
-	$('settings_import_button', 'click', settings.load_from_input);
-	$('settings_export_button', 'click', settings.export);
-
-	// Suppress keybinds when in text field
-	Array.from(document.getElementsByTagName('input'))
-		.map(e => e.id)
-		.forEach(utils.suppress_keybinds);
-
-	// Detect when query has changed and update search results
-	$('search', 'input', api.query_change);
-}
-
-function change_setting_menu(){
-	const select = $d('setting_option');
-	const value = select.value;
-	$l(`Switching settings to display ${value}`);
-	$q('div', select.parentNode).forEach(e => e.style.display = 'none');
-	$d(`setting_${value}`, select.parentNode).style.display = 'inline';
-}
-
-function remove_toJSON(){
-	// this gave me a lot of greif. e621 changes the toJSON
-	// methods and creates not optimal JSON.
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
-	delete Object.prototype.toJSON;
-	delete Date.prototype.toJSON;
-	delete String.prototype.toJSON;
-	delete Array.prototype.toJSON;
-	delete Number.prototype.toJSON;
-
-	// kira I don't know what this did, but it gave me errors. So I removed it.
-	jQuery.event.dispatch = () => '';
-}
-
-// id, class, query
-function $d(id, node=document){ return document.getElementById(id); }
-function $c(classname, node=document){ return Array.from(node.getElementsByClassName(classname)); }
-function $q(options, node=document){ return Array.from(node.querySelectorAll(options)); }
-
-// error, log, message
-function $e(message){ $l(message); $m(message); }
-function $l(message){ console.log(message); }
-function $m(message){ document.getElementById('message_box').innerText = message; }
-
 const local = {
 	settings_name: 'quick_tag_settings',
 	get: () => {
@@ -162,14 +83,14 @@ const settings = {
 	},
 	fill_selector: () => {
 		$l('Clearing saved settings');
-		utils.clear_node($d('previous_settings'));
+		utils.clear_node($d('local_saved_settings'));
 
 		$l('Getting names of saved settings');
 		const named_nodes = local.names().map($);
 		const nodes = [$('blank')].concat(named_nodes);
 
 		$l('Setting option values');
-		nodes.forEach(e => $d('previous_settings').appendChild(e));
+		nodes.forEach(e => $d('local_saved_settings').appendChild(e));
 
 		function $(name){
 			const node = document.createElement('option');
@@ -180,7 +101,7 @@ const settings = {
 	},
 	update_selector: () => {
 		$l('Setting seletor has changed')
-		const name = $d('previous_settings').value;
+		const name = $d('local_saved_settings').value;
 		$l(`Selector has value of ${name}`);
 		if(name != 'blank'){
 			settings.load_from_storage(name);
@@ -269,7 +190,7 @@ const navigation = {
 			api.index = 0;
 			return $l('No more posts to load. We are at the start.')
 		}
-		api.switch_to_post(api.posts[api.index].id)
+		api.switch_to_post(api.posts[api.index].id);
 		settings.rules_off();
 	},
 	next: async () => {
@@ -280,8 +201,9 @@ const navigation = {
 		}
 		api.switch_to_post(api.posts[api.index].id)
 		settings.rules_off();
+		return undefined;
 	}
-}
+};
 
 const utils = {
 	suppress_keybinds: (id) => {
@@ -346,17 +268,13 @@ const utils = {
 			node.removeChild(node.children[0]);
 		}
 	},
-	clear_page: () => {
-		utils.clear_node(document.head);
-		utils.clear_node(document.body);
-	},
 
 	html_to_node: (html) => {
 		const temp_node = document.createElement('div');
 		temp_node.innerHTML = html;
 		return temp_node.firstElementChild;
 	}
-}
+};
 
 const api = {
 	last_field_change: 0,
@@ -443,6 +361,9 @@ const api = {
 		if(api.posts.length < api.index + 5){
 			api.search();
 		}
+
+		// Scroll the scrollbar to this post
+		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop;
 	},
 	post_to_node: (post) => {
 		return utils.html_to_node(`

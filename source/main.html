@@ -10,7 +10,7 @@
 			</select>
 			<div id="setting_load">
 				<span>Using Settings</span>
-				<select id="previous_settings">
+				<select id="local_saved_settings">
 					<option value="">Blank</option>
 				</select>
 			</div>
@@ -34,8 +34,6 @@
 				<input id="username_info" placeholder="username"></input>
 				<input id="apikey_info" placeholder="api key"></input>
 			</div>
-			<br>
-			<span id="message_box">If this changes theres an error</span>
 		</div>
 		<div class="nav_buttons">
 			<div>
@@ -49,14 +47,22 @@
 				<button id="next_button_keycode" class="setting_button">?</button>
 			</div>
 		</div>
+		<div>
+			<span id="message_box">If this changes theres an error</span>
+		</div>
 	</div>
+	<!-- End top section-->
+
 	<div id="navigation">
 		<input id="search" placeholder="search query"></input>
 	</div>
-	<div id="image">
-	</div>
+	
+	<div id="image"></div>
+
 	<div id="tags">
 		<button id="add_blank_tag">Add a blank rule</button>
 	</div>
+	
+	<!-- Is an aboslute elem-->
 	<a id="quick_post_link"></a>
 </div>

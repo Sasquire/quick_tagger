@@ -1,18 +1,34 @@
 const fs = require('fs');
-const _ = (p) => fs.readFileSync(p);
+const _ = (p) => fs.readFileSync(`./source/${p}`, 'utf8');
 
-const full = `${_('./header.js')}
+const full = `${_('header.js')}
 
-${_('./main.js')}
+// Todo ${''/* This is actual text, not a todo*/}
+${
+	fs.readFileSync('./todo.txt', 'utf8')
+		.split('\n')
+		.map(e => `// ${e}`) // Uses // because /* might get broke? */
+		.join('\n')
+}
 
-utils.clear_page();
-remove_toJSON();
+${_('utility_functions.js')}
 
-// eslint-disable-next-line new-cap, no-undef
-GM_addStyle(\`${_('./main.css')}\`);
-document.body.innerHTML = \`${_('./main.html')}\`;
+${_('main.js')}
 
-init();
+
+
+/* █████ █   █ █████ █████
+     █   ██  █   █     █
+     █   █ █ █   █     █
+     █   █  ██   █     █
+   █████ █   █ █████   █   */
+
+${_('init_clear.js')}
+GM_addStyle(\`${_('main.css')}\`);
+
+document.body.innerHTML = \`${_('main.html')}\`;
+
+${_('init_start.js')}
 `;
 
 fs.writeFileSync('./quick_tagger.js', full, 'utf8');

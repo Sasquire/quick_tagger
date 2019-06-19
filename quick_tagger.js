@@ -17,77 +17,64 @@
 
 // Init is run at bottom of script
 
-// todo
+
+// Todo 
 // multi button hotkeys, for example
 //   mm for m/m, mf for m/f, so on
 //   sf for solo_focus, df for duo focus
+// 
 // save edit history
 //   useful for going back and seeing what you've changed
 //   would it be better to use localstorage or GM.setValue
+// 
 // apply tags on post load
 //   if a post already has say male when it is loaded
 //   highlight the male box, so users do not highlight it a second time
 //   could be bad because then they turn the rule off.
 //   but maybe make that not remove the rule.
+// 
 // get flash to work correctly
 //   I didn't find it worth my time to get it working well
+// 
 // allow blacklist
 //   I figure if you want to use this, you don't care about blacklist
 //   but someone will want this feature, because i hope this
 //   tool doesnt fall into obscurity
+// 
 // update post navigation
 //   automatically scroll the thing when new posts are loaded
+// 
 // actually have pretty css
-//   I don't into colors, so make a nice greyscale one
+//   I don't into colors, so make a nice grayscale one
 //   Just change all my bad decisions into good ones
 
-
-function init(){
-	// Add event listener to id with action and function
-	const $ = (id, action, func) => {
-		let node = document.body;
-		if(id != undefined){
-			node = document.getElementById(id);
-		}
-		node.addEventListener(action, func);
-	};
-
-	// Drop-down menu to switch between functions
-	$('setting_option', 'change', change_setting_menu);
-	change_setting_menu(); // Run the command once to init
-
-	$('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
-
-	$(undefined, 'keydown', handle_key_press); // Watch for hotkey press
-
-	// Allow clicking buttons to submit, next, and previous
-	$('submit_button', 'click', navigation.submit);
-	$('next_button', 'click', navigation.next);
-	$('previous_button', 'click', navigation.previous);
-	// Turn the buttons into setting listeners
-	['submit', 'next', 'previous']
-		.map(e => `${e}_button_keycode`)
-		.forEach(utils.setting_listener);
-
-	settings.fill_selector(); // Load settings from memory and display
-	$('previous_settings', 'change', settings.update_selector); // Watch for update
-
-	// update userinfo button
-	$('update_userinfo', 'click', local.save_userinfo);
-
-	// Handle importing saving of settings
-	$('save_settings', 'click', local.save_current);
-	$('settings_import_button', 'click', settings.load_from_input);
-	$('settings_export_button', 'click', settings.export);
-
-	// Suppress keybinds when in text field
-	Array.from(document.getElementsByTagName('input'))
-		.map(e => e.id)
-		.forEach(utils.suppress_keybinds);
-
-	// Detect when query has changed and update search results
-	$('search', 'input', api.query_change);
+// Getting elements, used because they get lengthy
+function $d(id, node = document){
+	return node.getElementById(id);
 }
+
+function $c(classname, node = document){
+	return Array.from(node.getElementsByClassName(classname));
+}
+
+function $q(options, node = document){
+	return Array.from(node.querySelectorAll(options));
+}
+
+// Logging, because its more useful to have good messages
+function $e(message){
+	$l(message);
+	$m(message);
+}
+
+function $l(message){
+	console.log(message);
+}
+
+function $m(message){
+	document.getElementById('message_box').innerText = message;
+}
+
 
 function change_setting_menu(){
 	const select = $d('setting_option');
@@ -96,30 +83,6 @@ function change_setting_menu(){
 	$q('div', select.parentNode).forEach(e => e.style.display = 'none');
 	$d(`setting_${value}`, select.parentNode).style.display = 'inline';
 }
-
-function remove_toJSON(){
-	// this gave me a lot of greif. e621 changes the toJSON
-	// methods and creates not optimal JSON.
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
-	delete Object.prototype.toJSON;
-	delete Date.prototype.toJSON;
-	delete String.prototype.toJSON;
-	delete Array.prototype.toJSON;
-	delete Number.prototype.toJSON;
-
-	// kira I don't know what this did, but it gave me errors. So I removed it.
-	jQuery.event.dispatch = () => '';
-}
-
-// id, class, query
-function $d(id, node=document){ return document.getElementById(id); }
-function $c(classname, node=document){ return Array.from(node.getElementsByClassName(classname)); }
-function $q(options, node=document){ return Array.from(node.querySelectorAll(options)); }
-
-// error, log, message
-function $e(message){ $l(message); $m(message); }
-function $l(message){ console.log(message); }
-function $m(message){ document.getElementById('message_box').innerText = message; }
 
 const local = {
 	settings_name: 'quick_tag_settings',
@@ -206,14 +169,14 @@ const settings = {
 	},
 	fill_selector: () => {
 		$l('Clearing saved settings');
-		utils.clear_node($d('previous_settings'));
+		utils.clear_node($d('local_saved_settings'));
 
 		$l('Getting names of saved settings');
 		const named_nodes = local.names().map($);
 		const nodes = [$('blank')].concat(named_nodes);
 
 		$l('Setting option values');
-		nodes.forEach(e => $d('previous_settings').appendChild(e));
+		nodes.forEach(e => $d('local_saved_settings').appendChild(e));
 
 		function $(name){
 			const node = document.createElement('option');
@@ -224,7 +187,7 @@ const settings = {
 	},
 	update_selector: () => {
 		$l('Setting seletor has changed')
-		const name = $d('previous_settings').value;
+		const name = $d('local_saved_settings').value;
 		$l(`Selector has value of ${name}`);
 		if(name != 'blank'){
 			settings.load_from_storage(name);
@@ -313,7 +276,7 @@ const navigation = {
 			api.index = 0;
 			return $l('No more posts to load. We are at the start.')
 		}
-		api.switch_to_post(api.posts[api.index].id)
+		api.switch_to_post(api.posts[api.index].id);
 		settings.rules_off();
 	},
 	next: async () => {
@@ -324,8 +287,9 @@ const navigation = {
 		}
 		api.switch_to_post(api.posts[api.index].id)
 		settings.rules_off();
+		return undefined;
 	}
-}
+};
 
 const utils = {
 	suppress_keybinds: (id) => {
@@ -390,17 +354,13 @@ const utils = {
 			node.removeChild(node.children[0]);
 		}
 	},
-	clear_page: () => {
-		utils.clear_node(document.head);
-		utils.clear_node(document.body);
-	},
 
 	html_to_node: (html) => {
 		const temp_node = document.createElement('div');
 		temp_node.innerHTML = html;
 		return temp_node.firstElementChild;
 	}
-}
+};
 
 const api = {
 	last_field_change: 0,
@@ -487,6 +447,9 @@ const api = {
 		if(api.posts.length < api.index + 5){
 			api.search();
 		}
+
+		// Scroll the scrollbar to this post
+		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop;
 	},
 	post_to_node: (post) => {
 		return utils.html_to_node(`
@@ -569,10 +532,41 @@ function handle_key_press(event){
 }
 
 
-utils.clear_page();
-remove_toJSON();
 
-// eslint-disable-next-line new-cap, no-undef
+
+/* █████ █   █ █████ █████
+     █   ██  █   █     █
+     █   █ █ █   █     █
+     █   █  ██   █     █
+   █████ █   █ █████   █   */
+
+(() => {
+	function clear_node(node){
+		while(node.children.length > 0){
+			node.removeChild(node.children[0]);
+		}
+	}
+
+	function remove_toJSON(){
+		// This gave me a lot of greif. e621 changes the toJSON
+		// methods and creates not optimal JSON.
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+		delete Object.prototype.toJSON;
+		delete Date.prototype.toJSON;
+		delete String.prototype.toJSON;
+		delete Array.prototype.toJSON;
+		delete Number.prototype.toJSON;
+
+		// Kira I don't know what this did, but it gave me errors. So I removed it.
+		// eslint-disable-next-line no-undef
+		jQuery.event.dispatch = () => '';
+	}
+
+	clear_node(document.head);
+	clear_node(document.body);
+	remove_toJSON();
+})();
+
 GM_addStyle(`body, body > * {
 	padding: 0px;
 	margin: 0px;
@@ -672,6 +666,7 @@ GM_addStyle(`body, body > * {
 	color:red;
 }
 `);
+
 document.body.innerHTML = `<div id="main">
 	<div id="settings">
 		<div id="setting_selects">
@@ -684,7 +679,7 @@ document.body.innerHTML = `<div id="main">
 			</select>
 			<div id="setting_load">
 				<span>Using Settings</span>
-				<select id="previous_settings">
+				<select id="local_saved_settings">
 					<option value="">Blank</option>
 				</select>
 			</div>
@@ -708,8 +703,6 @@ document.body.innerHTML = `<div id="main">
 				<input id="username_info" placeholder="username"></input>
 				<input id="apikey_info" placeholder="api key"></input>
 			</div>
-			<br>
-			<span id="message_box">If this changes theres an error</span>
 		</div>
 		<div class="nav_buttons">
 			<div>
@@ -723,16 +716,70 @@ document.body.innerHTML = `<div id="main">
 				<button id="next_button_keycode" class="setting_button">?</button>
 			</div>
 		</div>
+		<div>
+			<span id="message_box">If this changes theres an error</span>
+		</div>
 	</div>
+	<!-- End top section-->
+
 	<div id="navigation">
 		<input id="search" placeholder="search query"></input>
 	</div>
-	<div id="image">
-	</div>
+	
+	<div id="image"></div>
+
 	<div id="tags">
 		<button id="add_blank_tag">Add a blank rule</button>
 	</div>
+	
+	<!-- Is an aboslute elem-->
 	<a id="quick_post_link"></a>
 </div>`;
 
-init();
+// Things get defined elsewhere, so its fine.
+/* eslint-disable no-undef */
+
+(() => {
+	// Add event listener to id with action and function
+	const $ = (id, action, func) => {
+		const node = document.getElementById(id) || document.body;
+		node.addEventListener(action, func);
+	};
+
+	// Drop-down menu to switch between functions
+	$('setting_option', 'change', change_setting_menu);
+	change_setting_menu(); // Run the command once to init
+
+	$('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
+
+	$(undefined, 'keydown', handle_key_press); // Watch for hotkey press
+
+	// Allow clicking buttons to submit, next, and previous
+	$('submit_button', 'click', navigation.submit);
+	$('next_button', 'click', navigation.next);
+	$('previous_button', 'click', navigation.previous);
+	// Turn the buttons into setting listeners
+	['submit', 'next', 'previous']
+		.map(e => `${e}_button_keycode`)
+		.forEach(utils.setting_listener);
+
+	settings.fill_selector(); // Load settings from memory and display
+	$('local_saved_settings', 'change', settings.update_selector); // Watch for update
+
+	// update userinfo button
+	$('update_userinfo', 'click', local.save_userinfo);
+
+	// Handle importing saving of settings
+	$('save_settings', 'click', local.save_current);
+	$('settings_import_button', 'click', settings.load_from_input);
+	$('settings_export_button', 'click', settings.export);
+
+	// Suppress keybinds when in text field
+	Array.from(document.getElementsByTagName('input'))
+		.map(e => e.id)
+		.forEach(utils.suppress_keybinds);
+
+	// Detect when query has changed and update search results
+	$('search', 'input', api.query_change);
+})();
+
