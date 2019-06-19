@@ -7,8 +7,8 @@
 
 // @author      Sasquire
 
-// @match       http://e621.net/extensions/quick_tag
-// @match       https://e621.net/extensions/quick_tag
+// @match       http://e621.net/extensions/quick_tagger
+// @match       https://e621.net/extensions/quick_tagger
 
 // @grant       GM_addStyle
 // @grant       GM.setValue
