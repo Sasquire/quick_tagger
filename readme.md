@@ -1,8 +1,9 @@
 # Quick Tagger
 
-### [Install](link)
+### [Install](https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js)
 You must have some user script manager. [Greasy Fork](https://greasyfork.org/en) has a good list. (I use tampermonkey)
 
+***todo***
 ### [Examples](link)
 ### [e621 thread](link)
 
