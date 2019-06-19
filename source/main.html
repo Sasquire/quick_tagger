@@ -4,8 +4,7 @@
 			<select id="setting_option">
 				<option value="load">Load from disk</option>
 				<option value="import">Import/Export</option>
-				<option value="save">Save to disk</option>
-				<option value="delete">Delete from disk</option>
+				<option value="save">Save/Delete</option>
 				<option value="userinfo">Set user info</option>
 			</select>
 			<div id="setting_load">
@@ -21,13 +20,9 @@
 			</div>
 			<div id="setting_save">
 				<button id="save_settings">Save</button>
-				<span>as</span>
-				<input id="settings_name" placeholder="settings name"></input>
-			</div>
-			<div id="setting_delete">
 				<button id="delete_settings">Delete</button>
-				<span>the setting named</span>
-				<input id="setting_name_to_delete" placeholder="setting name"></input>
+				<span>setting named</span>
+				<input id="settings_name" placeholder="settings name"></input>
 			</div>
 			<div id="setting_userinfo">
 				<button id="update_userinfo">Update</button>
@@ -53,16 +48,7 @@
 	</div>
 	<!-- End top section-->
 
-	<div id="navigation">
-		<input id="search" placeholder="search query"></input>
-	</div>
-	
+	<div id="navigation"><input id="search" placeholder="search query"></input></div>
 	<div id="image"></div>
-
-	<div id="tags">
-		<button id="add_blank_tag">Add a blank rule</button>
-	</div>
-	
-	<!-- Is an aboslute elem-->
-	<a id="quick_post_link"></a>
+	<div id="tags"><button id="add_blank_tag">Add a blank rule</button></div>
 </div>

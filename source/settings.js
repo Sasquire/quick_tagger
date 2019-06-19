@@ -98,14 +98,14 @@ const settings = {
 		$('next_button_keycode', 'innerText', obj.next);
 		$('previous_button_keycode', 'innerText', obj.previous);
 		$('search', 'value', obj.query);
-		api.search().then(e => api.switch_to_post(api.posts[0].id));
+		api.search().then(e => navigation.switch_to_post(api.posts[0].id));
 
 		// Remove current rules
 		$c('tag_rule').forEach(e => e.parentNode.removeChild(e));
 
 		// Add new rules
 		obj.rules.forEach((e, i) => {
-			settings.add_blank_tag();
+			rules.add_blank_tag();
 			$(`rule_${i}_tags`, 'value', e.tags_to_add);
 			$(`rule_${i}_keycode`, 'innerText', e.keycode);
 		});
@@ -122,60 +122,5 @@ const settings = {
 			tags_to_add: $q('input.rule_tags', e).value,
 			keycode: $q('.setting_button', e).innerText
 		}))
-	}),
-
-	// Turns all the rules off
-	rules_off: () => {
-		$c('tag_rule').forEach(e => {
-			e.setAttribute('data-activated', false);
-			$q('input[type=checkbox]', e)[0].checked = false;
-		});
-	},
-
-	// Gets the changes from the rules
-	tag_changes: () => {
-		return $c('tag_rule')
-			.filter(e => e.getAttribute('data-activated') === 'true')
-			.map(e => $q('input.rule_tags', e).value)
-			.map(e => e.split(' '))
-			.reduce((acc, e) => ({
-				to_add: [...acc.to_add, ...(e.filter(t => t.charAt(0) != '-'))],
-				to_del: [...acc.to_del, ...(e.filter(t => t.charAt(0) == '-'))]
-			}), {
-				to_add: [],
-				to_del: []
-			});
-	},
-
-	// Adds a blank tag to the tag listing
-	add_blank_tag: () => {
-		$l('Adding blank rule');
-		const rule_count = $c('tag_rule').length;
-
-		// Insert new node
-		document.getElementById('tags').appendChild(utils.html_to_node(`
-			<div id="rule_${rule_count}" class="tag_rule">
-				<input
-					id="rule_${rule_count}_applied"
-					type="checkbox"
-				></input>
-				
-				<input
-					id="rule_${rule_count}_tags"
-					class="rule_tags"
-					placeholder="tags to add"
-				></input>
-				
-				<button
-					id="rule_${rule_count}_keycode"
-					class="setting_button"
-				>?</button>
-			</div>
-		`));
-
-		// Add listeners
-		utils.rule_toggle_listener(`rule_${rule_count}`);
-		utils.suppress_keybinds(`rule_${rule_count}_tags`);
-		utils.setting_listener(`rule_${rule_count}_keycode`);
-	}
+	})
 };

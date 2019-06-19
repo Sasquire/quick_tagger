@@ -15,26 +15,11 @@ const utils = {
 		function text_box_off(){ utils.in_text_box = false; }
 	},
 
-	// Given an id adds an eventlistener to toggle the rule on click
-	rule_toggle_listener: (id) => {
-		$el(`${id}_applied`, 'click', () => utils.toggle_rule(id));
-	},
-
-	// Toggles a rule with a given id
-	toggle_rule: (id) => {
-		$l(`Toggling rule ${id}`);
-		// Get current value
-		const node = $d(id);
-		const val = node.getAttribute('data-activated') === 'true';
-
-		// Update rule
-		node.querySelector('input[type=checkbox]').checked = !val;
-		node.setAttribute('data-activated', !val);
-	},
-
 	// Adds an eventlistener to a node for when its clicked
 	post_switcher_listener: (post_id) => {
-		$el(`post_${post_id}`, 'click', () => api.switch_to_post(post_id));
+		$el(`post_${post_id}`, 'click', () => {
+			navigation.switch_to_post(post_id);
+		});
 	},
 
 	toggle_post: (id) => {

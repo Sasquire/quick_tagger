@@ -17,6 +17,7 @@ ${_('local_storage.js')}
 ${_('settings.js')}
 ${_('navigation.js')}
 ${_('utils.js')}
+${_('rules.js')}
 ${_('api.js')}
 
 

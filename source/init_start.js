@@ -5,7 +5,9 @@
 	$el('setting_option', 'change', change_setting_menu);
 	change_setting_menu(); // Run the command once to init
 
-	$el('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
+	local.display_userinfo(); // Async but displays if username is known
+
+	$el('add_blank_tag', 'click', rules.add_blank_tag); // Blank tag button
 
 	$el(undefined, 'keydown', handle_key_press); // Watch for hotkey press
 
@@ -25,9 +27,12 @@
 	$el('update_userinfo', 'click', local.save_userinfo);
 
 	// Handle importing saving of settings
-	$el('save_settings', 'click', local.save_current);
 	$el('settings_import_button', 'click', settings.load_from_input);
 	$el('settings_export_button', 'click', settings.export);
+
+	// Save/delete buttons
+	$el('save_settings', 'click', local.save_current);
+	$el('delete_settings', 'click', local.delete_name);
 
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))
@@ -60,7 +65,7 @@
 			case 'submit_button_keycode': navigation.submit(); break;
 			case 'next_button_keycode': navigation.next(); break;
 			case 'previous_button_keycode': navigation.previous(); break;
-			default: utils.toggle_rule(node.parentNode.id);
+			default: rules.toggle_rule(node.parentNode.id);
 		}
 	}
 })();

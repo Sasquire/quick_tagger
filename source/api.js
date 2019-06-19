@@ -91,32 +91,6 @@ const api = {
 		$d('image').setAttribute('data-file_type', file_ext);
 	},
 
-	switch_to_post: (post_id) => {
-		$l(`Switching big display to post ${post_id}`);
-
-		// Find post and set as selected
-		const post_index = api.posts.findIndex(e => e.id == post_id);
-		api.index = post_index;
-		const post = api.posts[post_index];
-		if(post_index == -1){
-			return $e(`Error: post #${post_id} could not be found`);
-		}
-		$d(`post_${post_id}`).setAttribute('data-visited', true);
-		$d('quick_post_link').href = `https://e621.net/post/show/${post_id}`;
-		$d('quick_post_link').innerText = post_id;
-
-		api.display_image(post.file_ext, post.file_url, post.sample_url);
-
-		// If there are not enough images after this one get more
-		if(api.posts.length < api.index + 5){
-			api.search();
-		}
-
-		// Scroll the scrollbar to this post
-		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop;
-		return undefined;
-	},
-
 	// Takes an e621 post_obj and makes a DOM node
 	post_to_node: (post) => {
 		const link = `https://e621.net/post/show/${post.id}`;
@@ -205,5 +179,7 @@ const api = {
 		}
 
 		return undefined;
-	}
+	},
+
+	current_id: () => api.posts[api.index].id
 };

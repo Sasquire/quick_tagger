@@ -167,6 +167,17 @@ const local = {
 		await GM.setValue('username', $d('username_info').value);
 		await GM.setValue('api_key', $d('apikey_info').value);
 		$l('Saved user info');
+	},
+
+	display_userinfo: async () => {
+		$l('Showing if userinfo is saved');
+		const username = await GM.getValue('username');
+		const no_username = username == undefined || username == '';
+		$d('username_info').value = no_username ? '' : username;
+
+		const api_key = await GM.getValue('api_key');
+		const no_api_key = api_key == undefined || api_key == '';
+		$d('apikey_info').value = no_api_key ? '' : '<secret>';
 	}
 };
 
@@ -270,14 +281,14 @@ const settings = {
 		$('next_button_keycode', 'innerText', obj.next);
 		$('previous_button_keycode', 'innerText', obj.previous);
 		$('search', 'value', obj.query);
-		api.search().then(e => api.switch_to_post(api.posts[0].id));
+		api.search().then(e => navigation.switch_to_post(api.posts[0].id));
 
 		// Remove current rules
 		$c('tag_rule').forEach(e => e.parentNode.removeChild(e));
 
 		// Add new rules
 		obj.rules.forEach((e, i) => {
-			settings.add_blank_tag();
+			rules.add_blank_tag();
 			$(`rule_${i}_tags`, 'value', e.tags_to_add);
 			$(`rule_${i}_keycode`, 'innerText', e.keycode);
 		});
@@ -294,92 +305,71 @@ const settings = {
 			tags_to_add: $q('input.rule_tags', e).value,
 			keycode: $q('.setting_button', e).innerText
 		}))
-	}),
-
-	// Turns all the rules off
-	rules_off: () => {
-		$c('tag_rule').forEach(e => {
-			e.setAttribute('data-activated', false);
-			$q('input[type=checkbox]', e)[0].checked = false;
-		});
-	},
-
-	// Gets the changes from the rules
-	tag_changes: () => {
-		return $c('tag_rule')
-			.filter(e => e.getAttribute('data-activated') === 'true')
-			.map(e => $q('input.rule_tags', e).value)
-			.map(e => e.split(' '))
-			.reduce((acc, e) => ({
-				to_add: [...acc.to_add, ...(e.filter(t => t.charAt(0) != '-'))],
-				to_del: [...acc.to_del, ...(e.filter(t => t.charAt(0) == '-'))]
-			}), {
-				to_add: [],
-				to_del: []
-			});
-	},
-
-	// Adds a blank tag to the tag listing
-	add_blank_tag: () => {
-		$l('Adding blank rule');
-		const rule_count = $c('tag_rule').length;
-
-		// Insert new node
-		document.getElementById('tags').appendChild(utils.html_to_node(`
-			<div id="rule_${rule_count}" class="tag_rule">
-				<input
-					id="rule_${rule_count}_applied"
-					type="checkbox"
-				></input>
-				
-				<input
-					id="rule_${rule_count}_tags"
-					class="rule_tags"
-					placeholder="tags to add"
-				></input>
-				
-				<button
-					id="rule_${rule_count}_keycode"
-					class="setting_button"
-				>?</button>
-			</div>
-		`));
-
-		// Add listeners
-		utils.rule_toggle_listener(`rule_${rule_count}`);
-		utils.suppress_keybinds(`rule_${rule_count}_tags`);
-		utils.setting_listener(`rule_${rule_count}_keycode`);
-	}
+	})
 };
 
 /* eslint-disable no-undef */
 const navigation = {
 	submit: async () => {
 		$l('Submitting this post');
-		const tags_to_add = settings.tags_to_add().split(' ');
-		const post_id = api.posts[api.index].id;
-		await api.edit_tags(post_id, tags_to_add, []);
+
+		const post_id = api.current_id();
+		const { to_add, to_del } = rules.tag_changes();
+		console.log(rules.tag_changes())
+		await api.edit_tags(post_id, to_add, to_del);
+
 		navigation.next();
 	},
+
 	previous: async () => {
 		$l('Going to the previous post');
+
 		api.index -= 1;
 		if(api.index < 0){
 			api.index = 0;
-			return $l('No more posts to load. We are at the start.');
+			$l('No more posts to load. We are at the start.');
+		} else {
+			// Update UI
+			navigation.switch_to_post(api.current_id());
+			rules.rules_off();
 		}
-		api.switch_to_post(api.posts[api.index].id);
-		settings.rules_off();
-		return undefined;
 	},
+
 	next: async () => {
 		$l('Going to the next post');
+
 		api.index += 1;
 		if(api.index > api.posts.length){
-			return $l('No more posts to load, some should load soon');
+			api.index = api.posts.length - 1;
+			$l('No more posts to load, some should load soon');
+		} else {
+			// Update UI
+			navigation.switch_to_post(api.current_id());
+			rules.rules_off();
 		}
-		api.switch_to_post(api.posts[api.index].id);
-		settings.rules_off();
+	},
+
+	switch_to_post: (post_id) => {
+		$l(`Switching big display to post ${post_id}`);
+
+		// Find post and set as selected
+		const post_index = api.posts.findIndex(e => e.id == post_id);
+		api.index = post_index;
+		const post = api.posts[post_index];
+		if(post_index == -1){
+			return $e(`Error: post #${post_id} could not be found`);
+		}
+		$d(`post_${post_id}`).setAttribute('data-visited', true);
+
+		api.display_image(post.file_ext, post.file_url, post.sample_url);
+
+		// If there are not enough images after this one get more
+		if(api.posts.length < api.index + 5){
+			api.search();
+		}
+
+		// Scroll the scrollbar to this post
+		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop - 75;
 		return undefined;
 	}
 };
@@ -401,26 +391,11 @@ const utils = {
 		function text_box_off(){ utils.in_text_box = false; }
 	},
 
-	// Given an id adds an eventlistener to toggle the rule on click
-	rule_toggle_listener: (id) => {
-		$el(`${id}_applied`, 'click', () => utils.toggle_rule(id));
-	},
-
-	// Toggles a rule with a given id
-	toggle_rule: (id) => {
-		$l(`Toggling rule ${id}`);
-		// Get current value
-		const node = $d(id);
-		const val = node.getAttribute('data-activated') === 'true';
-
-		// Update rule
-		node.querySelector('input[type=checkbox]').checked = !val;
-		node.setAttribute('data-activated', !val);
-	},
-
 	// Adds an eventlistener to a node for when its clicked
 	post_switcher_listener: (post_id) => {
-		$el(`post_${post_id}`, 'click', () => api.switch_to_post(post_id));
+		$el(`post_${post_id}`, 'click', () => {
+			navigation.switch_to_post(post_id);
+		});
 	},
 
 	toggle_post: (id) => {
@@ -467,6 +442,80 @@ const utils = {
 		const temp_node = document.createElement('div');
 		temp_node.innerHTML = html;
 		return temp_node.firstElementChild;
+	}
+};
+
+/* eslint-disable no-undef */
+const rules = {
+	// Given an id adds an eventlistener to toggle the rule on click
+	rule_toggle_listener: (id) => {
+		$el(`${id}_applied`, 'click', () => rules.toggle_rule(id));
+	},
+
+	// Toggles a rule with a given id
+	toggle_rule: (id) => {
+		$l(`Toggling rule ${id}`);
+		// Get current value
+		const node = $d(id);
+		const val = node.getAttribute('data-activated') === 'true';
+
+		// Update rule
+		node.querySelector('input[type=checkbox]').checked = !val;
+		node.setAttribute('data-activated', !val);
+	},
+
+	// Turns all the rules off
+	rules_off: () => {
+		$c('tag_rule').forEach(e => {
+			e.setAttribute('data-activated', false);
+			$q('input[type=checkbox]', e)[0].checked = false;
+		});
+	},
+
+	// Gets the changes from the rules
+	tag_changes: () => {
+		const all_tags = $c('tag_rule')
+			.filter(e => e.getAttribute('data-activated') === 'true')
+			.map(e => $q('input.rule_tags', e)[0].value)
+			.map(e => e.split(' '))
+			.reduce((acc, e) => [...acc, ...e]);
+
+		return {
+			to_add: all_tags.filter(e => e.charAt(0) != '-'),
+			to_del: all_tags.filter(e => e.charAt(0) == '-')
+		};
+	},
+
+	// Adds a blank tag to the tag listing
+	add_blank_tag: () => {
+		$l('Adding blank rule');
+		const rule_count = $c('tag_rule').length;
+
+		// Insert new node
+		$d('tags').appendChild(utils.html_to_node(`
+			<div id="rule_${rule_count}" class="tag_rule">
+				<input
+					id="rule_${rule_count}_applied"
+					type="checkbox"
+				></input>
+				
+				<input
+					id="rule_${rule_count}_tags"
+					class="rule_tags"
+					placeholder="tags to add"
+				></input>
+				
+				<button
+					id="rule_${rule_count}_keycode"
+					class="setting_button"
+				>?</button>
+			</div>
+		`));
+
+		// Add listeners
+		rules.rule_toggle_listener(`rule_${rule_count}`);
+		utils.suppress_keybinds(`rule_${rule_count}_tags`);
+		utils.setting_listener(`rule_${rule_count}_keycode`);
 	}
 };
 
@@ -563,32 +612,6 @@ const api = {
 		$d('image').setAttribute('data-file_type', file_ext);
 	},
 
-	switch_to_post: (post_id) => {
-		$l(`Switching big display to post ${post_id}`);
-
-		// Find post and set as selected
-		const post_index = api.posts.findIndex(e => e.id == post_id);
-		api.index = post_index;
-		const post = api.posts[post_index];
-		if(post_index == -1){
-			return $e(`Error: post #${post_id} could not be found`);
-		}
-		$d(`post_${post_id}`).setAttribute('data-visited', true);
-		$d('quick_post_link').href = `https://e621.net/post/show/${post_id}`;
-		$d('quick_post_link').innerText = post_id;
-
-		api.display_image(post.file_ext, post.file_url, post.sample_url);
-
-		// If there are not enough images after this one get more
-		if(api.posts.length < api.index + 5){
-			api.search();
-		}
-
-		// Scroll the scrollbar to this post
-		$d('navigation').scrollTop = $d(`post_${post_id}`).offsetTop;
-		return undefined;
-	},
-
 	// Takes an e621 post_obj and makes a DOM node
 	post_to_node: (post) => {
 		const link = `https://e621.net/post/show/${post.id}`;
@@ -677,7 +700,9 @@ const api = {
 		}
 
 		return undefined;
-	}
+	},
+
+	current_id: () => api.posts[api.index].id
 };
 
 
@@ -793,13 +818,6 @@ GM_addStyle(`body, body > * {
 	margin: auto;
 	align-self: center;
 }
-#quick_post_link {
-	display: block;
-	position: absolute;
-	top: 75px;
-	left: 190px;
-	color: white;
-}
 
 .setting_button {
 	background-color: lightcyan;
@@ -822,8 +840,7 @@ document.body.innerHTML = `<div id="main">
 			<select id="setting_option">
 				<option value="load">Load from disk</option>
 				<option value="import">Import/Export</option>
-				<option value="save">Save to disk</option>
-				<option value="delete">Delete from disk</option>
+				<option value="save">Save/Delete</option>
 				<option value="userinfo">Set user info</option>
 			</select>
 			<div id="setting_load">
@@ -839,13 +856,9 @@ document.body.innerHTML = `<div id="main">
 			</div>
 			<div id="setting_save">
 				<button id="save_settings">Save</button>
-				<span>as</span>
-				<input id="settings_name" placeholder="settings name"></input>
-			</div>
-			<div id="setting_delete">
 				<button id="delete_settings">Delete</button>
-				<span>the setting named</span>
-				<input id="setting_name_to_delete" placeholder="setting name"></input>
+				<span>setting named</span>
+				<input id="settings_name" placeholder="settings name"></input>
 			</div>
 			<div id="setting_userinfo">
 				<button id="update_userinfo">Update</button>
@@ -871,18 +884,9 @@ document.body.innerHTML = `<div id="main">
 	</div>
 	<!-- End top section-->
 
-	<div id="navigation">
-		<input id="search" placeholder="search query"></input>
-	</div>
-	
+	<div id="navigation"><input id="search" placeholder="search query"></input></div>
 	<div id="image"></div>
-
-	<div id="tags">
-		<button id="add_blank_tag">Add a blank rule</button>
-	</div>
-	
-	<!-- Is an aboslute elem-->
-	<a id="quick_post_link"></a>
+	<div id="tags"><button id="add_blank_tag">Add a blank rule</button></div>
 </div>`;
 
 // Things get defined elsewhere, so its fine.
@@ -892,7 +896,9 @@ document.body.innerHTML = `<div id="main">
 	$el('setting_option', 'change', change_setting_menu);
 	change_setting_menu(); // Run the command once to init
 
-	$el('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
+	local.display_userinfo(); // Async but displays if username is known
+
+	$el('add_blank_tag', 'click', rules.add_blank_tag); // Blank tag button
 
 	$el(undefined, 'keydown', handle_key_press); // Watch for hotkey press
 
@@ -912,9 +918,12 @@ document.body.innerHTML = `<div id="main">
 	$el('update_userinfo', 'click', local.save_userinfo);
 
 	// Handle importing saving of settings
-	$el('save_settings', 'click', local.save_current);
 	$el('settings_import_button', 'click', settings.load_from_input);
 	$el('settings_export_button', 'click', settings.export);
+
+	// Save/delete buttons
+	$el('save_settings', 'click', local.save_current);
+	$el('delete_settings', 'click', local.delete_name);
 
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))
@@ -947,7 +956,7 @@ document.body.innerHTML = `<div id="main">
 			case 'submit_button_keycode': navigation.submit(); break;
 			case 'next_button_keycode': navigation.next(); break;
 			case 'previous_button_keycode': navigation.previous(); break;
-			default: utils.toggle_rule(node.parentNode.id);
+			default: rules.toggle_rule(node.parentNode.id);
 		}
 	}
 })();

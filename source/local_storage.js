@@ -83,5 +83,16 @@ const local = {
 		await GM.setValue('username', $d('username_info').value);
 		await GM.setValue('api_key', $d('apikey_info').value);
 		$l('Saved user info');
+	},
+
+	display_userinfo: async () => {
+		$l('Showing if userinfo is saved');
+		const username = await GM.getValue('username');
+		const no_username = username == undefined || username == '';
+		$d('username_info').value = no_username ? '' : username;
+
+		const api_key = await GM.getValue('api_key');
+		const no_api_key = api_key == undefined || api_key == '';
+		$d('apikey_info').value = no_api_key ? '' : '<secret>';
 	}
 };
