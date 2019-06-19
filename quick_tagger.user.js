@@ -24,6 +24,11 @@
 // Advanced character count, requires editing the json
 // to setup the settings to act this way.
 // {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"}]}
+// 
+// Settings to remove/add patreon and patreon logo
+// from many posts. People mistag patreon as a posts
+// that happens to have the text patreon in it
+// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"patreon","rules":[{"tags_to_add":"patreon","keycode":"p"},{"tags_to_add":"-patreon","keycode":"r"},{"tags_to_add":"patreon_logo","keycode":"l"}]}
 
 // Todo 
 // multi button hotkeys, for example
@@ -477,11 +482,13 @@ const rules = {
 			.filter(e => e.getAttribute('data-activated') === 'true')
 			.map(e => $q('input.rule_tags', e)[0].value)
 			.map(e => e.split(' '))
-			.reduce((acc, e) => [...acc, ...e]);
+			.flat();
 
 		return {
 			to_add: all_tags.filter(e => e.charAt(0) != '-'),
-			to_del: all_tags.filter(e => e.charAt(0) == '-')
+			to_del: all_tags
+				.filter(e => e.charAt(0) == '-')
+				.map(e => e.substring(1))
 		};
 	},
 

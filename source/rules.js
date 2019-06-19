@@ -31,11 +31,13 @@ const rules = {
 			.filter(e => e.getAttribute('data-activated') === 'true')
 			.map(e => $q('input.rule_tags', e)[0].value)
 			.map(e => e.split(' '))
-			.reduce((acc, e) => [...acc, ...e]);
+			.flat();
 
 		return {
 			to_add: all_tags.filter(e => e.charAt(0) != '-'),
-			to_del: all_tags.filter(e => e.charAt(0) == '-')
+			to_del: all_tags
+				.filter(e => e.charAt(0) == '-')
+				.map(e => e.substring(1))
 		};
 	},
 
