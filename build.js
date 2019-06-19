@@ -3,7 +3,7 @@ const _ = (p) => fs.readFileSync(`./source/${p}`, 'utf8');
 
 const full = `${_('header.js')}
 
-// Todo ${''/* This is actual text, not a todo*/}
+// Todo ${''/* This is actual text, not a todo */}
 ${
 	fs.readFileSync('./todo.txt', 'utf8')
 		.split('\n')
@@ -12,6 +12,12 @@ ${
 }
 
 ${_('utility_functions.js')}
+
+${_('local_storage.js')}
+${_('settings.js')}
+${_('navigation.js')}
+
+${_('api.js')}
 
 ${_('main.js')}
 

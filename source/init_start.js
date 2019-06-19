@@ -42,7 +42,7 @@
 		const value = select.value;
 		$l(`Switching settings to display ${value}`);
 		$q('div', select.parentNode).forEach(e => (e.style.display = 'none'));
-		$d(`setting_${value}`, select.parentNode).style.display = 'inline';
+		$d(`setting_${value}`).style.display = 'inline';
 	}
 
 	// Add event listener to id with action and function
