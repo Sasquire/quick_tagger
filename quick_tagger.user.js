@@ -3,7 +3,7 @@
 // @description  Custom page for quickly tagging sets of tags
 
 // @namespace   http://tampermonkey.net/
-// @version     1.00003
+// @version     1.00005
 
 // @author      Sasquire
 
@@ -714,6 +714,7 @@ const api = {
 
 
 
+/* eslint-disable no-undef */
 (() => {
 	function clear_node(node){
 		while(node.children.length > 0){
@@ -732,8 +733,9 @@ const api = {
 		delete Number.prototype.toJSON;
 
 		// Kira I don't know what this did, but it gave me errors. So I removed it.
-		// eslint-disable-next-line no-undef
-		jQuery.event.dispatch = () => '';
+		if(jQuery){
+			jQuery.event.dispatch = () => '';
+		}
 	}
 
 	clear_node(document.head);

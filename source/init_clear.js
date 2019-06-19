@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 (() => {
 	function clear_node(node){
 		while(node.children.length > 0){
@@ -16,8 +17,9 @@
 		delete Number.prototype.toJSON;
 
 		// Kira I don't know what this did, but it gave me errors. So I removed it.
-		// eslint-disable-next-line no-undef
-		jQuery.event.dispatch = () => '';
+		if(jQuery){
+			jQuery.event.dispatch = () => '';
+		}
 	}
 
 	clear_node(document.head);

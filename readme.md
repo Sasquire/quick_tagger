@@ -3,8 +3,9 @@
 ### [Install](https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js)
 You must have some user script manager. [Greasy Fork](https://greasyfork.org/en) has a good list. (I use tampermonkey)
 
+### [Tagging page](https://e621.net/extensions/quick_tagger)
+### [Examples](https://imgur.com/a/oSKa2MY)
 ***todo***
-### [Examples](link)
 ### [e621 thread](link)
 
 #### What is this?
