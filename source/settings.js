@@ -1,8 +1,4 @@
 /* eslint-disable no-undef */
-
-// Testing settings string
-// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"z"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"group","keycode":"g"}]}
-
 const settings = {
 	load_from_storage: (name) => {
 		$l(`Loading settings named ${name}`);
@@ -17,6 +13,7 @@ const settings = {
 	},
 
 	// Loads settings based on string
+	// Todo set the query to blank everytime
 	load_from_input: () => {
 		$l('Loading settings from input string');
 		const opts = $d('settings_import').value;
@@ -119,8 +116,8 @@ const settings = {
 		query: $d('search').value,
 
 		rules: $c('tag_rule').map(e => ({
-			tags_to_add: $q('input.rule_tags', e).value,
-			keycode: $q('.setting_button', e).innerText
+			tags_to_add: $q('input.rule_tags', e)[0].value,
+			keycode: $q('.setting_button', e)[0].innerText
 		}))
 	})
 };

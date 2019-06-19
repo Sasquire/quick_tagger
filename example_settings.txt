@@ -1,0 +1,6 @@
+Simple character count
+{"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"z"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"group","keycode":"g"}]}
+
+Advanced character count, requires editing the json
+to setup the settings to act this way.
+{"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"}]}

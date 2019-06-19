@@ -3,7 +3,7 @@
 // @description  Custom page for quickly tagging sets of tags
 
 // @namespace   http://tampermonkey.net/
-// @version     1.00002
+// @version     1.00003
 
 // @author      Sasquire
 
@@ -17,6 +17,13 @@
 
 // Init is run at bottom of script
 
+// Here are some example setting strings
+// Simple character count
+// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"z"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"group","keycode":"g"}]}
+// 
+// Advanced character count, requires editing the json
+// to setup the settings to act this way.
+// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"}]}
 
 // Todo 
 // multi button hotkeys, for example
@@ -43,10 +50,6 @@
 // 
 // update post navigation
 //   automatically scroll the thing when new posts are loaded
-// 
-// actually have pretty css
-//   I don't into colors, so make a nice grayscale one
-//   Just change all my bad decisions into good ones
 
 // Getting elements, used because they get lengthy
 function $d(id, node = document){
@@ -184,10 +187,6 @@ const local = {
 };
 
 /* eslint-disable no-undef */
-
-// Testing settings string
-// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"z"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"group","keycode":"g"}]}
-
 const settings = {
 	load_from_storage: (name) => {
 		$l(`Loading settings named ${name}`);
@@ -202,6 +201,7 @@ const settings = {
 	},
 
 	// Loads settings based on string
+	// Todo set the query to blank everytime
 	load_from_input: () => {
 		$l('Loading settings from input string');
 		const opts = $d('settings_import').value;
@@ -304,8 +304,8 @@ const settings = {
 		query: $d('search').value,
 
 		rules: $c('tag_rule').map(e => ({
-			tags_to_add: $q('input.rule_tags', e).value,
-			keycode: $q('.setting_button', e).innerText
+			tags_to_add: $q('input.rule_tags', e)[0].value,
+			keycode: $q('.setting_button', e)[0].innerText
 		}))
 	})
 };
@@ -707,12 +707,6 @@ const api = {
 
 
 
-/* █████ █   █ █████ █████
-     █   ██  █   █     █
-     █   █ █ █   █     █
-     █   █  ██   █     █
-   █████ █   █ █████   █   */
-
 (() => {
 	function clear_node(node){
 		while(node.children.length > 0){
@@ -826,6 +820,7 @@ button {
 #settings > * { margin-right: auto; }
 
 
+
 /* tag_rule settings */
 .tag_rule {
 	padding: 10px 0px;
@@ -835,11 +830,11 @@ button {
 .tag_rule > .rule_tags { width: 0px; flex-grow: 1; }
 .tag_rule[data-activated=true] { background-color: var(--dark-yellow); }
 
-
-#search {
-	align-self: baseline;
-	width: 95%;
+.rule_tags {
+	border: none;
+	background-color: #fff8;
 }
+
 
 
 /* minipost settings */
@@ -862,6 +857,9 @@ button {
 	color: white;
 }
 
+
+
+/* Settings for big image in center */
 #image {
 	display:flex;
 }
@@ -872,15 +870,20 @@ button {
 	align-self: center;
 }
 
-.rule_tags {
-	border: none;
-	background-color: #fff8;
+#image[data-file_type="swf"] {
+	border: 10px solid #39a;
 }
-.tag_rule {
-	color:red;
+#image[data-file_type="webm"] {
+	border: 10px solid #9fa;
 }
-`);
 
+
+
+/* Search bar */
+#search {
+	align-self: baseline;
+	width: 95%;
+}`);
 document.body.innerHTML = `<div id="main">
 	<div id="settings">
 		<div id="setting_selects">
@@ -935,7 +938,6 @@ document.body.innerHTML = `<div id="main">
 	<div id="image"></div>
 	<div id="tags"><button id="add_blank_tag">Add a blank rule</button></div>
 </div>`;
-
 // Things get defined elsewhere, so its fine.
 /* eslint-disable no-undef */
 (() => {

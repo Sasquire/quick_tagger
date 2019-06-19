@@ -84,6 +84,7 @@ button {
 #settings > * { margin-right: auto; }
 
 
+
 /* tag_rule settings */
 .tag_rule {
 	padding: 10px 0px;
@@ -93,11 +94,11 @@ button {
 .tag_rule > .rule_tags { width: 0px; flex-grow: 1; }
 .tag_rule[data-activated=true] { background-color: var(--dark-yellow); }
 
-
-#search {
-	align-self: baseline;
-	width: 95%;
+.rule_tags {
+	border: none;
+	background-color: #fff8;
 }
+
 
 
 /* minipost settings */
@@ -120,6 +121,9 @@ button {
 	color: white;
 }
 
+
+
+/* Settings for big image in center */
 #image {
 	display:flex;
 }
@@ -130,10 +134,17 @@ button {
 	align-self: center;
 }
 
-.rule_tags {
-	border: none;
-	background-color: #fff8;
+#image[data-file_type="swf"] {
+	border: 10px solid #39a;
 }
-.tag_rule {
-	color:red;
+#image[data-file_type="webm"] {
+	border: 10px solid #9fa;
+}
+
+
+
+/* Search bar */
+#search {
+	align-self: baseline;
+	width: 95%;
 }
