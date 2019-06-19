@@ -3,7 +3,7 @@
 // @description  Custom page for quickly tagging sets of tags
 
 // @namespace   http://tampermonkey.net/
-// @version     1.00003
+// @version     1.00005
 
 // @author      Sasquire
 

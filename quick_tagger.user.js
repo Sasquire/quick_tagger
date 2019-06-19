@@ -869,6 +869,7 @@ button {
 /* Settings for big image in center */
 #image {
 	display:flex;
+	overflow: hidden;
 }
 #image > * {
 	max-width: 90%;

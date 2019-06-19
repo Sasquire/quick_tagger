@@ -24,3 +24,11 @@ If you would like to start working on some code, there are a list of things that
 #### Have an issue?
 
 Contact [me on e621.net](https://e621.net/user/show/170289) or leave an issue on this github page. To properly diagnose the problem I would need a log from what was happening before the program crashed. To do this open up the [developer console](https://webmasters.stackexchange.com/a/77337) and include the recent messages.
+
+#### Tested on
+
+Tampermonkey version 4.8.5847 on
+Firefox Quantum 67.0 (64-bit) Arch Linux
+
+Tampermonkey version 4.9.5941 on
+Chromium 74.0.3729.169 (Official Build) Arch Linux (64-bit)
