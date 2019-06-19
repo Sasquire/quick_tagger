@@ -1,0 +1,62 @@
+<div id="main">
+	<div id="settings">
+		<div id="setting_selects">
+			<select id="setting_option">
+				<option value="load">Load from disk</option>
+				<option value="import">Import/Export</option>
+				<option value="save">Save to disk</option>
+				<option value="delete">Delete from disk</option>
+				<option value="userinfo">Set user info</option>
+			</select>
+			<div id="setting_load">
+				<span>Using Settings</span>
+				<select id="previous_settings">
+					<option value="">Blank</option>
+				</select>
+			</div>
+			<div id="setting_import">
+				<button id="settings_export_button">Export</button>
+				<button id="settings_import_button">Import</button>
+				<input id="settings_import" placeholder="Input settings string"></input>
+			</div>
+			<div id="setting_save">
+				<button id="save_settings">Save</button>
+				<span>as</span>
+				<input id="settings_name" placeholder="settings name"></input>
+			</div>
+			<div id="setting_delete">
+				<button id="delete_settings">Delete</button>
+				<span>the setting named</span>
+				<input id="setting_name_to_delete" placeholder="setting name"></input>
+			</div>
+			<div id="setting_userinfo">
+				<button id="update_userinfo">Update</button>
+				<input id="username_info" placeholder="username"></input>
+				<input id="apikey_info" placeholder="api key"></input>
+			</div>
+			<br>
+			<span id="message_box">If this changes theres an error</span>
+		</div>
+		<div class="nav_buttons">
+			<div>
+				<button id="previous_button">Previous Post</button>
+				<button id="previous_button_keycode" class="setting_button">?</button>
+			</div><div>
+				<button id="submit_button">Submit</button>
+				<button id="submit_button_keycode" class="setting_button">?</button>
+			</div><div>
+				<button id="next_button">Next Post</button>
+				<button id="next_button_keycode" class="setting_button">?</button>
+			</div>
+		</div>
+	</div>
+	<div id="navigation">
+		<input id="search" placeholder="search query"></input>
+	</div>
+	<div id="image">
+	</div>
+	<div id="tags">
+		<button id="add_blank_tag">Add a blank rule</button>
+	</div>
+	<a id="quick_post_link"></a>
+</div>
