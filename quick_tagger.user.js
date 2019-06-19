@@ -75,6 +75,12 @@ function $m(message){
 	document.getElementById('message_box').innerText = message;
 }
 
+// Add event listener to id with action and function
+function $el(id, action, func){
+	const node = $d(id) || document.body;
+	node.addEventListener(action, func);
+}
+
 
 /* eslint-disable no-undef */
 const local = {
@@ -378,6 +384,91 @@ const navigation = {
 	}
 };
 
+/* eslint-disable no-undef */
+const utils = {
+	// Will change a global that says when the user is in a
+	// textbox. This is because you can't use hotkeys
+	// while you are in a textbox
+	suppress_keybinds: (idnode) => {
+		// Idnode could be a string or a html node.
+		// Makes things a little confusing to use, but helpful to have
+		const node = (typeof idnode == 'string') ? $d(idnode) : idnode;
+		node.addEventListener('focus', text_box_on);
+		node.addEventListener('blur', text_box_off);
+
+		// Toggles for being in a text box
+		function text_box_on(){ utils.in_text_box = true; }
+		function text_box_off(){ utils.in_text_box = false; }
+	},
+
+	// Given an id adds an eventlistener to toggle the rule on click
+	rule_toggle_listener: (id) => {
+		$el(`${id}_applied`, 'click', () => utils.toggle_rule(id));
+	},
+
+	// Toggles a rule with a given id
+	toggle_rule: (id) => {
+		$l(`Toggling rule ${id}`);
+		// Get current value
+		const node = $d(id);
+		const val = node.getAttribute('data-activated') === 'true';
+
+		// Update rule
+		node.querySelector('input[type=checkbox]').checked = !val;
+		node.setAttribute('data-activated', !val);
+	},
+
+	// Adds an eventlistener to a node for when its clicked
+	post_switcher_listener: (post_id) => {
+		$el(`post_${post_id}`, 'click', () => api.switch_to_post(post_id));
+	},
+
+	toggle_post: (id) => {
+		// ?
+	},
+
+	// Turns a button into a setting button
+	// This means that when the button is clicked
+	// it waits for some input before it will update its innerText
+	setting_listener: (id) => {
+		const btn = $d(id);
+		btn.addEventListener('click', () => {
+			if(utils.waiting_for_setting){ return; } // Don't set multiple at once
+			$l(`Waiting for keypress to assign to ${id}`);
+			set_keycode('<waiting>');
+			btn.blur(); // Allows for arrow keys
+			document.body.addEventListener('keydown', watch_key_press);
+
+			utils.waiting_for_setting = true;
+		});
+
+		function watch_key_press(e){
+			if(utils.in_text_box){ return; } // Dont set if typing in text_box
+			$l(`Updating ${id} with keycode ${e.key}`);
+			document.body.removeEventListener('keydown', watch_key_press);
+			set_keycode(e.key);
+
+			utils.waiting_for_setting = false;
+		}
+
+		function set_keycode(msg){ $d(id).innerText = msg; }
+	},
+
+	waiting_for_setting: false,
+	in_text_box: false,
+
+	clear_node: (node) => {
+		while(node.children.length > 0){
+			node.removeChild(node.children[0]);
+		}
+	},
+
+	html_to_node: (html) => {
+		const temp_node = document.createElement('div');
+		temp_node.innerHTML = html;
+		return temp_node.firstElementChild;
+	}
+};
 
 /* eslint-disable no-undef */
 const api = {
@@ -590,91 +681,6 @@ const api = {
 };
 
 
-const utils = {
-	suppress_keybinds: (id) => {
-		const node = $d(id);
-		node.addEventListener('focus', utils.text_box_on);
-		node.addEventListener('blur', utils.text_box_off);
-	},
-	rule_toggle_listener: (id) => {
-		$d(id+'_applied').addEventListener('click', () => utils.toggle_rule(id));
-	},
-	toggle_rule: (id) => {
-		$l(`Toggling rule ${id}`);
-		const node = $d(id);
-		const val = node.getAttribute('data-activated') === 'true' ? true : false;
-		node.querySelector('input[type=checkbox]').checked = !val;
-		node.setAttribute('data-activated', !val);
-	},
-
-	post_switcher_listener: (post_id) => {
-		$d(`post_${post_id}`).addEventListener('click', () => api.switch_to_post(post_id));
-	},
-	toggle_post: (id) => {
-		const node = $d(`post_${id}`);
-
-	},
-
-	setting_listener: (id) => {
-		const btn = $d(id);
-		btn.addEventListener('click', () => {
-			if(utils.waiting_for_setting){ return; } // don't set multiple at once
-			$l(`Waiting for keypress to assign to ${id}`);
-			utils.waiting_on();
-			set_keycode('<waiting>');
-			btn.blur(); // allows for arrow keys
-			document.body.addEventListener('keydown', watch_key_press);
-		});
-
-		function watch_key_press(e){
-			if(utils.in_text_box){ return; } // dont set if typing
-			$l(`Updating ${id} with keycode ${e.key}`);
-			document.body.removeEventListener('keydown', watch_key_press);
-			set_keycode(e.key);
-			utils.waiting_off();
-		}
-
-		var set_keycode = (msg) => $d(id).innerText = msg;
-	},
-
-	waiting_for_setting: false,
-	in_text_box: false,
-
-	set_waiting: (val) => utils.waiting_for_setting = val,
-	waiting_off: () => utils.set_waiting(false),
-	waiting_on: () => utils.set_waiting(true),
-
-	set_text_box: (val) => utils.in_text_box = val,
-	text_box_off: () => utils.set_text_box(false),
-	text_box_on: () => utils.set_text_box(true),
-
-	clear_node: (node) => {
-		while(node.children.length > 0){
-			node.removeChild(node.children[0]);
-		}
-	},
-
-	html_to_node: (html) => {
-		const temp_node = document.createElement('div');
-		temp_node.innerHTML = html;
-		return temp_node.firstElementChild;
-	}
-};
-
-function handle_key_press(event){
-	if(utils.waiting_for_setting || utils.in_text_box){ return; }
-
-	$c('setting_button')
-		.filter(e => e.innerText == event.key)
-		.forEach(e => {switch(e.id){
-			case 'submit_button_keycode': navigation.submit(); break;
-			case 'next_button_keycode': navigation.next(); break;
-			case 'previous_button_keycode': navigation.previous(); break;
-			default: utils.toggle_rule(e.parentNode.id);
-		}});
-}
-
-
 
 
 /* █████ █   █ █████ █████
@@ -883,32 +889,32 @@ document.body.innerHTML = `<div id="main">
 /* eslint-disable no-undef */
 (() => {
 	// Drop-down menu to switch between functions
-	$('setting_option', 'change', change_setting_menu);
+	$el('setting_option', 'change', change_setting_menu);
 	change_setting_menu(); // Run the command once to init
 
-	$('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
+	$el('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
 
-	$(undefined, 'keydown', handle_key_press); // Watch for hotkey press
+	$el(undefined, 'keydown', handle_key_press); // Watch for hotkey press
 
 	// Allow clicking buttons to submit, next, and previous
-	$('submit_button', 'click', navigation.submit);
-	$('next_button', 'click', navigation.next);
-	$('previous_button', 'click', navigation.previous);
+	$el('submit_button', 'click', navigation.submit);
+	$el('next_button', 'click', navigation.next);
+	$el('previous_button', 'click', navigation.previous);
 	// Turn the buttons into setting listeners
 	['submit', 'next', 'previous']
 		.map(e => `${e}_button_keycode`)
 		.forEach(utils.setting_listener);
 
 	settings.fill_selector(); // Load settings from memory and display
-	$('local_saved_settings', 'change', settings.update_selector); // Watch for update
+	$el('local_saved_settings', 'change', settings.update_selector); // Watch for update
 
 	// update userinfo button
-	$('update_userinfo', 'click', local.save_userinfo);
+	$el('update_userinfo', 'click', local.save_userinfo);
 
 	// Handle importing saving of settings
-	$('save_settings', 'click', local.save_current);
-	$('settings_import_button', 'click', settings.load_from_input);
-	$('settings_export_button', 'click', settings.export);
+	$el('save_settings', 'click', local.save_current);
+	$el('settings_import_button', 'click', settings.load_from_input);
+	$el('settings_export_button', 'click', settings.export);
 
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))
@@ -916,7 +922,7 @@ document.body.innerHTML = `<div id="main">
 		.forEach(utils.suppress_keybinds);
 
 	// Detect when query has changed and update search results
-	$('search', 'input', api.query_change);
+	$el('search', 'input', api.query_change);
 
 	function change_setting_menu(){
 		const select = $d('setting_option');
@@ -926,10 +932,23 @@ document.body.innerHTML = `<div id="main">
 		$d(`setting_${value}`).style.display = 'inline';
 	}
 
-	// Add event listener to id with action and function
-	function $(id, action, func){
-		const node = document.getElementById(id) || document.body;
-		node.addEventListener(action, func);
+	function handle_key_press(event){
+		if(utils.waiting_for_setting || utils.in_text_box){
+			return;
+		}
+
+		$c('setting_button')
+			.filter(e => e.innerText == event.key)
+			.forEach(e => pressed(e));
+	}
+
+	function pressed(node){
+		switch (node.id) {
+			case 'submit_button_keycode': navigation.submit(); break;
+			case 'next_button_keycode': navigation.next(); break;
+			case 'previous_button_keycode': navigation.previous(); break;
+			default: utils.toggle_rule(node.parentNode.id);
+		}
 	}
 })();
 

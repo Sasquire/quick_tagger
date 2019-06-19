@@ -24,3 +24,9 @@ function $l(message){
 function $m(message){
 	document.getElementById('message_box').innerText = message;
 }
+
+// Add event listener to id with action and function
+function $el(id, action, func){
+	const node = $d(id) || document.body;
+	node.addEventListener(action, func);
+}

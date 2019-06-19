@@ -16,10 +16,8 @@ ${_('utility_functions.js')}
 ${_('local_storage.js')}
 ${_('settings.js')}
 ${_('navigation.js')}
-
+${_('utils.js')}
 ${_('api.js')}
-
-${_('main.js')}
 
 
 
@@ -37,4 +35,4 @@ document.body.innerHTML = \`${_('main.html')}\`;
 ${_('init_start.js')}
 `;
 
-fs.writeFileSync('./quick_tagger.js', full, 'utf8');
+fs.writeFileSync('./quick_tagger.user.js', full, 'utf8');

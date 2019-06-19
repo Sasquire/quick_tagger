@@ -2,32 +2,32 @@
 /* eslint-disable no-undef */
 (() => {
 	// Drop-down menu to switch between functions
-	$('setting_option', 'change', change_setting_menu);
+	$el('setting_option', 'change', change_setting_menu);
 	change_setting_menu(); // Run the command once to init
 
-	$('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
+	$el('add_blank_tag', 'click', settings.add_blank_tag); // Blank tag button
 
-	$(undefined, 'keydown', handle_key_press); // Watch for hotkey press
+	$el(undefined, 'keydown', handle_key_press); // Watch for hotkey press
 
 	// Allow clicking buttons to submit, next, and previous
-	$('submit_button', 'click', navigation.submit);
-	$('next_button', 'click', navigation.next);
-	$('previous_button', 'click', navigation.previous);
+	$el('submit_button', 'click', navigation.submit);
+	$el('next_button', 'click', navigation.next);
+	$el('previous_button', 'click', navigation.previous);
 	// Turn the buttons into setting listeners
 	['submit', 'next', 'previous']
 		.map(e => `${e}_button_keycode`)
 		.forEach(utils.setting_listener);
 
 	settings.fill_selector(); // Load settings from memory and display
-	$('local_saved_settings', 'change', settings.update_selector); // Watch for update
+	$el('local_saved_settings', 'change', settings.update_selector); // Watch for update
 
 	// update userinfo button
-	$('update_userinfo', 'click', local.save_userinfo);
+	$el('update_userinfo', 'click', local.save_userinfo);
 
 	// Handle importing saving of settings
-	$('save_settings', 'click', local.save_current);
-	$('settings_import_button', 'click', settings.load_from_input);
-	$('settings_export_button', 'click', settings.export);
+	$el('save_settings', 'click', local.save_current);
+	$el('settings_import_button', 'click', settings.load_from_input);
+	$el('settings_export_button', 'click', settings.export);
 
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))
@@ -35,7 +35,7 @@
 		.forEach(utils.suppress_keybinds);
 
 	// Detect when query has changed and update search results
-	$('search', 'input', api.query_change);
+	$el('search', 'input', api.query_change);
 
 	function change_setting_menu(){
 		const select = $d('setting_option');
@@ -45,9 +45,22 @@
 		$d(`setting_${value}`).style.display = 'inline';
 	}
 
-	// Add event listener to id with action and function
-	function $(id, action, func){
-		const node = document.getElementById(id) || document.body;
-		node.addEventListener(action, func);
+	function handle_key_press(event){
+		if(utils.waiting_for_setting || utils.in_text_box){
+			return;
+		}
+
+		$c('setting_button')
+			.filter(e => e.innerText == event.key)
+			.forEach(e => pressed(e));
+	}
+
+	function pressed(node){
+		switch (node.id) {
+			case 'submit_button_keycode': navigation.submit(); break;
+			case 'next_button_keycode': navigation.next(); break;
+			case 'previous_button_keycode': navigation.previous(); break;
+			default: utils.toggle_rule(node.parentNode.id);
+		}
 	}
 })();
