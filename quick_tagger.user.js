@@ -4,14 +4,14 @@
 
 // @namespace    https://github.com/sasquire
 // @author       Sasquire
-// @version      1.00005
+// @version      1.00006
 // @updateURL    https://github.com/Sasquire/quick_tagger/raw/master/source/header.js
 // @downloadURL  https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js
 
 // @homepage     https://github.com/Sasquire/quick_tagger
 // @source       https://github.com/Sasquire/quick_tagger
 // @supportURL   https://e621.net/user/show/170289
-// @icon
+// @icon         https://github.com/Sasquire/quick_tagger/raw/master/icon32.png
 
 // @match        http://e621.net/extensions/quick_tagger
 // @match        https://e621.net/extensions/quick_tagger
