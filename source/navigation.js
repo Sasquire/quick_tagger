@@ -5,6 +5,7 @@ const navigation = {
 
 		const post_id = api.current_id();
 		const { to_add, to_del } = rules.tag_changes();
+		history.add(post_id, to_add, to_del);
 		await api.edit_tags(post_id, to_add, to_del);
 
 		navigation.next();
@@ -20,6 +21,7 @@ const navigation = {
 		} else {
 			navigation.switch_to_post(api.current_id());
 		}
+		$l('');
 	},
 
 	next: async () => {
@@ -32,6 +34,7 @@ const navigation = {
 		} else {
 			navigation.switch_to_post(api.current_id());
 		}
+		$l('');
 	},
 
 	switch_to_post: (post_id) => {

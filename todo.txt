@@ -2,10 +2,6 @@ multi button hotkeys, for example
   mm for m/m, mf for m/f, so on
   sf for solo_focus, df for duo focus
 
-save edit history
-  useful for going back and seeing what you've changed
-  would it be better to use localstorage or GM.setValue
-
 apply tags on post load
   if a post already has say male when it is loaded
   highlight the male box, so users do not highlight it a second time
@@ -20,3 +16,8 @@ allow blacklist
   I figure if you want to use this, you don't care about blacklist
   but someone will want this feature, because i hope this
   tool doesnt fall into obscurity
+
+hidden tags
+  Something so that users can add tags that will
+  only show up in their history and not get posted to
+  e621. This would be useful for personal collections.

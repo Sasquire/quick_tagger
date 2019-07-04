@@ -4,7 +4,7 @@
 
 // @namespace    https://github.com/sasquire
 // @author       Sasquire
-// @version      1.00006
+// @version      1.00007
 // @updateURL    https://github.com/Sasquire/quick_tagger/raw/master/source/header.js
 // @downloadURL  https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js
 
@@ -31,19 +31,21 @@
 // to setup the settings to act this way.
 // {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"}]}
 // 
+// Very advanced character count
+// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"},{"tags_to_add":"disembodied_hand","keycode":"h"},{"tags_to_add":"disembodied_head","keycode":"H"},{"tags_to_add":"disembodied_penis","keycode":"p"},{"tags_to_add":"disembodied_tongue","keycode":"T"},{"tags_to_add":"faceless_male","keycode":"m"},{"tags_to_add":"facless_female","keycode":"f"},{"tags_to_add":"pov","keycode":"P"},{"tags_to_add":"tentacles","keycode":"t"}]}
+// 
 // Settings to remove/add patreon and patreon logo
 // from many posts. People mistag patreon as a posts
 // that happens to have the text patreon in it
 // {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"patreon","rules":[{"tags_to_add":"patreon","keycode":"p"},{"tags_to_add":"-patreon","keycode":"r"},{"tags_to_add":"patreon_logo","keycode":"l"}]}
+// 
+// Herm tagger (Don't do this its not appropriate for e6 yet)
+// {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"","rules":[{"tags_to_add":"male_herm","keycode":"m"},{"tags_to_add":"female_herm","keycode":"f"},{"tags_to_add":"ambiguous_herm","keycode":"a"},{"tags_to_add":"-herm","keycode":"n"}]}
 
 // Todo 
 // multi button hotkeys, for example
 //   mm for m/m, mf for m/f, so on
 //   sf for solo_focus, df for duo focus
-// 
-// save edit history
-//   useful for going back and seeing what you've changed
-//   would it be better to use localstorage or GM.setValue
 // 
 // apply tags on post load
 //   if a post already has say male when it is loaded
@@ -59,6 +61,11 @@
 //   I figure if you want to use this, you don't care about blacklist
 //   but someone will want this feature, because i hope this
 //   tool doesnt fall into obscurity
+// 
+// hidden tags
+//   Something so that users can add tags that will
+//   only show up in their history and not get posted to
+//   e621. This would be useful for personal collections.
 
 // Getting elements, used because they get lengthy
 function $d(id, node = document){
@@ -326,6 +333,7 @@ const navigation = {
 
 		const post_id = api.current_id();
 		const { to_add, to_del } = rules.tag_changes();
+		history.add(post_id, to_add, to_del);
 		await api.edit_tags(post_id, to_add, to_del);
 
 		navigation.next();
@@ -341,6 +349,7 @@ const navigation = {
 		} else {
 			navigation.switch_to_post(api.current_id());
 		}
+		$l('');
 	},
 
 	next: async () => {
@@ -353,6 +362,7 @@ const navigation = {
 		} else {
 			navigation.switch_to_post(api.current_id());
 		}
+		$l('');
 	},
 
 	switch_to_post: (post_id) => {
@@ -598,12 +608,12 @@ const api = {
 		if(file_ext == 'webm'){
 			$d('image').innerHTML = `
 			<video
-				id="webm-container"
-				controls=""
-				loop="true"
 				poster="${sample_url}"
+				id="webm-container"
+				controls
+				loop="true"
 			>
-				<source src="${file_url}" type="video/webm">
+				<source src="${file_url}" type="video/webm" />
 			</video>`;
 		} else if(file_ext == 'swf') {
 			$d('image').innerHTML = `
@@ -706,13 +716,78 @@ const api = {
 		const text = await result.text();
 
 		if(result.status != 200){
-			$e(`Error with post ${post_id} - Status ${e.status}\n${text}`);
+			$e(`Error with post ${post_id} - Status ${result.status}\n${text}`);
+			// Set background to red and switch back in 5s
+			$d('image').style.backgroundColor = 'darkred';
+			setTimeout(() => ($d('image').style.backgroundColor = ''), 5000);
 		}
 
 		return undefined;
 	},
 
 	current_id: () => api.posts[api.index].id
+};
+
+/* eslint-disable no-undef */
+const history = {
+	settings_name: 'history_settings',
+
+	// Get the object of settings
+	get: () => {
+		$l('Loading history object');
+		try {
+			const stored = localStorage.getItem(history.settings_name) || '[]';
+			const obj = JSON.parse(stored);
+			$l('History object loaded');
+			return obj;
+		} catch(e) {
+			$e('Problem loading history object');
+			throw e;
+		}
+	},
+
+	// Set the object of settings
+	set: (obj) => {
+		$l('Setting history object');
+		try {
+			const str = JSON.stringify(obj);
+			localStorage.setItem(history.settings_name, str);
+			$l('History object saved');
+		} catch(e) {
+			$e('Problem saving history object');
+			throw e;
+		}
+	},
+
+	add: (id, adding, removing) => {
+		$l('Adding item to history');
+		const old = history.get();
+		old.push({
+			id: id,
+			add: adding,
+			del: removing,
+			date: new Date().getTime()
+		});
+		history.set(old);
+	},
+
+	// https://stackoverflow.com/questions/16428835/save-data-from-localstorage-to-csv
+	export: () => {
+		$e('Exporting history to file');
+		const data = JSON.stringify(history.get());
+		const blob = new Blob([data], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = $d('export_history_hidden');
+		a.href = url;
+		a.download = `e621_tag_history_${new Date().getTime()}.json`;
+		a.click();
+	},
+
+	clear: () => {
+		history.export();
+		$e('Clearing History');
+		history.set([]);
+	}
 };
 
 
@@ -904,6 +979,7 @@ document.body.innerHTML = `<div id="main">
 				<option value="import">Import/Export</option>
 				<option value="save">Save/Delete</option>
 				<option value="userinfo">Set user info</option>
+				<option value="history">History</option>
 			</select>
 			<div id="setting_load">
 				<span>Using Settings</span>
@@ -926,6 +1002,13 @@ document.body.innerHTML = `<div id="main">
 				<button id="update_userinfo">Update</button>
 				<input id="username_info" placeholder="username"></input>
 				<input id="apikey_info" placeholder="api key"></input>
+			</div>
+			<div id="setting_history">
+				<button id="delete_history">Download + Delete</button>
+				<button id="export_history">Download</button>
+				<a id="export_history_hidden" style="display:none;"></a>
+				
+				<span>History</span>
 			</div>
 		</div>
 		<div class="nav_buttons">
@@ -985,6 +1068,9 @@ document.body.innerHTML = `<div id="main">
 	// Save/delete buttons
 	$el('save_settings', 'click', local.save_current);
 	$el('delete_settings', 'click', local.delete_name);
+
+	$el('delete_history', 'click', history.clear);
+	$el('export_history', 'click', history.export);
 
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))

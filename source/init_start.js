@@ -34,6 +34,9 @@
 	$el('save_settings', 'click', local.save_current);
 	$el('delete_settings', 'click', local.delete_name);
 
+	$el('delete_history', 'click', history.clear);
+	$el('export_history', 'click', history.export);
+
 	// Suppress keybinds when in text field
 	Array.from(document.getElementsByTagName('input'))
 		.map(e => e.id)

@@ -67,12 +67,12 @@ const api = {
 		if(file_ext == 'webm'){
 			$d('image').innerHTML = `
 			<video
-				id="webm-container"
-				controls=""
-				loop="true"
 				poster="${sample_url}"
+				id="webm-container"
+				controls
+				loop="true"
 			>
-				<source src="${file_url}" type="video/webm">
+				<source src="${file_url}" type="video/webm" />
 			</video>`;
 		} else if(file_ext == 'swf') {
 			$d('image').innerHTML = `
@@ -175,7 +175,10 @@ const api = {
 		const text = await result.text();
 
 		if(result.status != 200){
-			$e(`Error with post ${post_id} - Status ${e.status}\n${text}`);
+			$e(`Error with post ${post_id} - Status ${result.status}\n${text}`);
+			// Set background to red and switch back in 5s
+			$d('image').style.backgroundColor = 'darkred';
+			setTimeout(() => ($d('image').style.backgroundColor = ''), 5000);
 		}
 
 		return undefined;

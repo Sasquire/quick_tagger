@@ -26,6 +26,7 @@ ${_('navigation.js')}
 ${_('utils.js')}
 ${_('rules.js')}
 ${_('api.js')}
+${_('history.js')}
 
 
 

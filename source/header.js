@@ -4,7 +4,7 @@
 
 // @namespace    https://github.com/sasquire
 // @author       Sasquire
-// @version      1.00006
+// @version      1.00007
 // @updateURL    https://github.com/Sasquire/quick_tagger/raw/master/source/header.js
 // @downloadURL  https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js
 

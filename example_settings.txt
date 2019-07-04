@@ -5,7 +5,13 @@ Advanced character count, requires editing the json
 to setup the settings to act this way.
 {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"}]}
 
+Very advanced character count
+{"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"-zero_pictured -solo -duo -group","rules":[{"tags_to_add":"zero_pictured","keycode":"n"},{"tags_to_add":"solo","keycode":"s"},{"tags_to_add":"solo_focus","keycode":"S"},{"tags_to_add":"duo","keycode":"d"},{"tags_to_add":"duo_focus","keycode":"D"},{"tags_to_add":"group","keycode":"g"},{"tags_to_add":"disembodied_hand","keycode":"h"},{"tags_to_add":"disembodied_head","keycode":"H"},{"tags_to_add":"disembodied_penis","keycode":"p"},{"tags_to_add":"disembodied_tongue","keycode":"T"},{"tags_to_add":"faceless_male","keycode":"m"},{"tags_to_add":"facless_female","keycode":"f"},{"tags_to_add":"pov","keycode":"P"},{"tags_to_add":"tentacles","keycode":"t"}]}
+
 Settings to remove/add patreon and patreon logo
 from many posts. People mistag patreon as a posts
 that happens to have the text patreon in it
 {"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"patreon","rules":[{"tags_to_add":"patreon","keycode":"p"},{"tags_to_add":"-patreon","keycode":"r"},{"tags_to_add":"patreon_logo","keycode":"l"}]}
+
+Herm tagger (Don't do this its not appropriate for e6 yet)
+{"submit":"Enter","next":"ArrowRight","previous":"ArrowLeft","query":"","rules":[{"tags_to_add":"male_herm","keycode":"m"},{"tags_to_add":"female_herm","keycode":"f"},{"tags_to_add":"ambiguous_herm","keycode":"a"},{"tags_to_add":"-herm","keycode":"n"}]}
