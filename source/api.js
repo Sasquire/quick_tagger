@@ -184,5 +184,88 @@ const api = {
 		return undefined;
 	},
 
-	current_id: () => api.posts[api.index].id
+	current_id: () => api.posts[api.index].id,
+
+	upvote: async () => {
+		const post_id = api.current_id();
+		$e(`Sending request to upvote ${post_id}`);
+		const url = new URL('https://e621.net/post/vote.json');
+		const username = await GM.getValue('username');
+		const api_key = await GM.getValue('api_key');
+
+		url.searchParams.set('login', username);
+		url.searchParams.set('password_hash', api_key);
+		url.searchParams.set('id', post_id);
+		url.searchParams.set('score', '1');
+
+		const result = await fetch(new Request(url.href), {
+			method: 'POST',
+			'User-Agent': `Idem's Quick-Tag-Adder, used by ${username}`
+		});
+		const text = await result.text();
+
+		if(result.status != 200){
+			$e(`Error with post ${post_id} - Status ${result.status}\n${text}`);
+			// Set background to red and switch back in 5s
+			$d('image').style.backgroundColor = 'darkred';
+			setTimeout(() => ($d('image').style.backgroundColor = ''), 5000);
+		}
+
+		return undefined;
+	},
+
+	downvote: async () => {
+		const post_id = api.current_id();
+		$e(`Sending request to downvote ${post_id}`);
+		const url = new URL('https://e621.net/post/vote.json');
+		const username = await GM.getValue('username');
+		const api_key = await GM.getValue('api_key');
+
+		url.searchParams.set('login', username);
+		url.searchParams.set('password_hash', api_key);
+		url.searchParams.set('id', post_id);
+		url.searchParams.set('score', '-1');
+
+		const result = await fetch(new Request(url.href), {
+			method: 'POST',
+			'User-Agent': `Idem's Quick-Tag-Adder, used by ${username}`
+		});
+		const text = await result.text();
+
+		if(result.status != 200){
+			$e(`Error with post ${post_id} - Status ${result.status}\n${text}`);
+			// Set background to red and switch back in 5s
+			$d('image').style.backgroundColor = 'darkred';
+			setTimeout(() => ($d('image').style.backgroundColor = ''), 5000);
+		}
+
+		return undefined;
+	},
+
+	favorite: async () => {
+		const post_id = api.current_id();
+		$e(`Sending request to favorite ${post_id}`);
+		const url = new URL('https://e621.net/favorite/create.json');
+		const username = await GM.getValue('username');
+		const api_key = await GM.getValue('api_key');
+
+		url.searchParams.set('login', username);
+		url.searchParams.set('password_hash', api_key);
+		url.searchParams.set('id', post_id);
+
+		const result = await fetch(new Request(url.href), {
+			method: 'POST',
+			'User-Agent': `Idem's Quick-Tag-Adder, used by ${username}`
+		});
+		const text = await result.text();
+
+		if(result.status != 200){
+			$e(`Error with post ${post_id} - Status ${result.status}\n${text}`);
+			// Set background to red and switch back in 5s
+			$d('image').style.backgroundColor = 'darkred';
+			setTimeout(() => ($d('image').style.backgroundColor = ''), 5000);
+		}
+
+		return undefined;
+	}
 };

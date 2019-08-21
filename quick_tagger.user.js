@@ -61,6 +61,15 @@ GM_addStyle(GM_getResourceText('qt_css'));
 		.map(e => `${e}_button_keycode`)
 		.forEach(utils.setting_listener);
 
+    // Allow clicking buttons to submit, next, and previous
+	$el('upvote_button', 'click', api.upvote);
+	$el('favorite_button', 'click', api.favorite);
+	$el('downvote_button', 'click', api.downvote);
+	// Turn the buttons into setting listeners
+	['upvote', 'downvote', 'favorite']
+		.map(e => `${e}_button_keycode`)
+		.forEach(utils.setting_listener);
+
 	settings.fill_selector(); // Load settings from memory and display
 	$el('local_saved_settings', 'change', settings.update_selector); // Watch for update
 
@@ -109,6 +118,9 @@ GM_addStyle(GM_getResourceText('qt_css'));
 			case 'submit_button_keycode': navigation.submit(); break;
 			case 'next_button_keycode': navigation.next(); break;
 			case 'previous_button_keycode': navigation.previous(); break;
+			case 'upvote_button_keycode': api.upvote(); break;
+			case 'downvote_button_keycode': api.downvote(); break;
+			case 'favorite_button_keycode': api.favorite(); break;
 			default: rules.toggle_rule(node.parentNode.id);
 		}
 	}
