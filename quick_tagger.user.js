@@ -5,8 +5,8 @@
 // @namespace    https://github.com/sasquire
 // @author       Sasquire
 // @version      1.00009
-// @updateURL    https://github.com/Sasquire/quick_tagger/raw/master/source/header.js
-// @downloadURL  https://github.com/Sasquire/quick_tagger/raw/master/quick_tagger.user.js
+// @updateURL    https://raw.githubusercontent.com/Sasquire/quick_tagger/master/quick_tagger.user.js
+// @downloadURL  https://raw.githubusercontent.com/Sasquire/quick_tagger/master/quick_tagger.user.js
 
 // @homepage     https://github.com/Sasquire/quick_tagger
 // @source       https://github.com/Sasquire/quick_tagger
