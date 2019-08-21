@@ -87,13 +87,20 @@ const settings = {
 	//     ...
 	//   ]}
 	set: (obj) => {
-		const $ = (id, prop, text) => ($d(id)[prop] = text);
+		const $ = (id, prop, text) => {
+			const node = $d(id);
+			if(!node){ return; }
+			node[prop] = text || 'unbound';
+		};
 		$l('Updating UI to have new settings');
 		$l(obj);
 
 		$('submit_button_keycode', 'innerText', obj.submit);
 		$('next_button_keycode', 'innerText', obj.next);
 		$('previous_button_keycode', 'innerText', obj.previous);
+		$('upvote_button_keycode', 'innerText', obj.upvote);
+		$('downvote_button_keycode', 'innerText', obj.downvote);
+		$('favorite_button_keycode', 'innerText', obj.favorite);
 		$('search', 'value', obj.query);
 		api.search().then(e => navigation.switch_to_post(api.posts[0].id));
 
@@ -113,6 +120,9 @@ const settings = {
 		submit: $d('submit_button_keycode').innerText,
 		next: $d('next_button_keycode').innerText,
 		previous: $d('previous_button_keycode').innerText,
+		upvote: $d('upvote_button_keycode').innerText,
+		downvote: $d('downvote_button_keycode').innerText,
+		favorite: $d('favorite_button_keycode').innerText,
 		query: $d('search').value,
 
 		rules: $c('tag_rule').map(e => ({
