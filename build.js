@@ -7,10 +7,10 @@ const { performance } = require('perf_hooks');
 const apply_header = require('./dependencies/prepend_text.js');
 const info = {
 	version: '2.00001',
-	authors: 'Meras'
-//	updateURL: 'https://raw.githubusercontent.com/Sasquire/Idems-Sourcing-Suite/master/distribution/header.user.js',
-//	downloadURL: 'https://raw.githubusercontent.com/Sasquire/Idems-Sourcing-Suite/master/distribution/main.user.js',
-//	icon: 'https://raw.githubusercontent.com/Sasquire/Idems-Sourcing-Suite/master/resources/icon32.png'
+	authors: 'Meras',
+	updateURL: 'https://github.com/Sasquire/quick_tagger/raw/master/distribution/header.user.js',
+	downloadURL: 'https://github.com/Sasquire/quick_tagger/raw/master/distribution/main.user.js',
+	icon: 'https://github.com/Sasquire/quick_tagger/raw/master/static/icon32.png'
 };
 
 function bundle (header_string) {
