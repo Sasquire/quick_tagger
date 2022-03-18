@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Idem's Quick Tagger
 // @description  Adds a page to QUICKLY tag images by hand
-// @version      1.00011
+// @version      2.00001
 // @author       Meras
 
 // @namespace    https://github.com/Sasquire/
 // @supportURL   https://github.com/Sasquire/Idems-Sourcing-Suite
-// @updateURL    undefined
-// @downloadURL  undefined
-// @icon         undefined
+// @updateURL    https://github.com/Sasquire/quick_tagger/raw/master/distribution/header.user.js
+// @downloadURL  https://github.com/Sasquire/quick_tagger/raw/master/distribution/main.user.js
+// @icon         https://github.com/Sasquire/quick_tagger/raw/master/static/icon32.png
 
 // @license      Unlicense
 
@@ -2460,7 +2460,7 @@ function init_page () {
 
 	do_stuff();
 
-	document.body.addEventListener('keydown', asssssss);
+	document.body.addEventListener('keydown', handle_hotkeys);
 
 	utils.get_value('network_delay').then(e => {
 		setInterval(network.make_one_post_edit_from_queue, e * 1000);
@@ -2504,7 +2504,7 @@ function do_stuff () {
 	});
 }
 
-function asssssss (event) {
+function handle_hotkeys (event) {
 	const tag_page_is_hidden = document.getElementById('tag_tab').classList.contains('hidden');
 	if (tag_page_is_hidden === false) {
 		const rules = Array.from(document.getElementsByClassName('tag_rule'));
