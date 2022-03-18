@@ -1,0 +1,53 @@
+{
+	"name": "idems_quick_tagger",
+	"version": "1.0.0",
+	"description": "A data labeling tool designed specifically for e621 with tag-edits in mind",
+	"scripts": {
+		"build": "node build.js"
+	},
+	"author": "",
+	"license": "Unlicense",
+	"private": true,
+	"devDependencies": {
+		"browserify": "^16.5.0",
+		"eslint": "^6.8.0",
+		"eslint-config-standard": "^14.1.0",
+		"eslint-plugin-import": "^2.20.1",
+		"eslint-plugin-node": "^11.0.0",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-standard": "^4.0.1",
+		"lz-string": "^1.4.4",
+		"stringify": "^5.2.0"
+	},
+	"eslintConfig": {
+		"extends": "standard",
+		"parserOptions": {
+			"ecmaVersion": 2020,
+			"sourceType": "module"
+		},
+		"env": {
+			"browser": true
+		},
+		"rules": {
+			"semi": [
+				"error",
+				"always"
+			],
+			"no-console": "off",
+			"indent": [
+				"error",
+				"tab",
+				{
+					"SwitchCase": 1,
+					"ignoreComments": true
+				}
+			],
+			"no-tabs": "off",
+			"camelcase": "off"
+		}
+	},
+	"main": "main.js",
+	"eslintIgnore": [
+		"distribution/*"
+	]
+}

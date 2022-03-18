@@ -1,3 +1,4 @@
+/* TODO make a list of common e621 colors */
 :root {
 	--dark-blue: #031131;
 	--blue: #284a81;
@@ -9,143 +10,204 @@
 	--dark-yellow: #d8b162;
 }
 
+/* Couple of helper functions */
+.hidden { display: none !important; }
+hr { width: 100%; }
+.danger_button {
+	background-color: indianred;
+	border-color: red;
+}
+
+/* Get #body to take up 100vh and automatically expand to take up more */
+/* https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height */
+html { height: 100%; }
+body { min-height: 100%; }
+body { display: flex; }
+#body { flex-grow: 1; }
+
+/* Set color on body and links so it matches the rest of the theme */
+body, a { color: white; }
+a:visited { color: #aaa; }
+
+/* Avoid unintended side effects. Easiest to just change settings manually */
 body, body > * {
 	padding: 0px;
 	margin: 0px;
 }
 
-/* 
-
-Stuff for the main setup
-
-*/
-#main {
-	height: 100vh;
-	display: grid;
-	grid-template-columns: 190px auto 200px;
-	grid-template-rows: 75px auto;
+/* Setup main view setting */
+#body {
+	display: flex;
+	flex-direction: column;
 }
 
-#settings {
-	grid-column: 1 / 4;
-	grid-row: 1 / 1;
-	display: flex;
-	justify-content: space-between;
-
+#header {
+	height: 10vh;
 	background-color: var(--dark-blue);
-	color: white;
 }
 
-#navigation {
-	grid-column: 1 / 1;
-	grid-row: 2 / 3;
-	overflow-y: scroll;
-	overflow-x: hidden;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-
-	background-color: var(--more-blue);
-}
-
-#tags {
-	grid-column: 3 / 3;
-	grid-row: 2 / 3;
-	display: flex;
-	flex-direction: column;
-	
-	background-color: var(--more-blue);
-}
-
-#image {
-	grid-column: 2 / 2;
-	grid-row: 2 / 3;
+#main {
 	background-color: var(--blue);
+	flex-grow: 1;
+}
+
+
+/* Settings for each tab */
+.tab {
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	flex-direction: row;
+	align-content: center;
+}
+
+.main {
+	height: calc(100vh - 10vh - 2rem);
+	overflow-y: auto;
+	overflow-x: hidden;
+	flex-grow: 1;
+	padding: 1rem;
+
+	display: flex;
+}
+
+.sidebar {
+	flex-shrink: 0; /* Doesn't allow it to shrink */
+	width: 16rem;
+	/* I don't like using calc like this, but I want the sidebar to scroll for
+	   the tagging tab, and this was the first thing I could think of for an
+	   element that also had flex-grow */
+	height: calc(100vh - 10vh - 2rem - 5px);
+	background-color: var(--dark-blue);
+	border-top: 5px solid var(--dark-yellow);
+	padding: 1rem;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.sidebar > span:first-child, .sidebar > hr + span {
+	font-size: 2rem;
 }
 
 
 
-/* Stuff for buttons */
-button {
-	border: none;
-	border-radius: 0.1rem;
-}
 
-.setting_button {
+
+/*
+Template-Tab Specific Settings
+*/
+
+.keybind_button {
 	border: none;
 	border-radius: 0.3rem;
 	background-color: var(--yellow);
+	min-width: 6rem;
 }
 
+/*
+Network-Tab Specific Settings
+*/
 
-
-/* Margin for the setting selector */
-#setting_option { margin-right: 3em; }
-#settings > * { margin-right: auto; }
-
-
-
-/* tag_rule settings */
-.tag_rule {
-	padding: 10px 0px;
-	display: flex;
-}
-#add_blank_rule { margin-bottom: 10px; }
-.tag_rule > .rule_tags { width: 0px; flex-grow: 1; }
-.tag_rule[data-activated=true] { background-color: var(--dark-yellow); }
-
-.rule_tags {
-	border: none;
-	background-color: #fff8;
+#network_main {
+	flex-direction: column;
 }
 
-
-
-/* minipost settings */
-.post {
-	 border: 1px solid white;
-	 padding: 0.25rem;
-	 margin: 0.25rem;
-	 width: 90%;
-	 display: flex;
-	 flex-direction: column;
-}
-.post > img { align-self: center; }
-.post[data-visited=true] { background-color: var(--yellow); }
-.post, .post a:visited, .post a {
-	text-shadow:
-		1px 1px #000,
-		-1px -1px 0 #000,
-		1px -1px 0 #000,
-		-1px 1px 0 #000;
-	color: white;
+#network_main > div:first-child {
+	font-size: 2rem;
 }
 
+#network_queue {
+	border-collapse: collapse;
 
+	display: block;
+	height: 0px;
+	flex-grow: 1;
+	overflow-y: auto;
+}
 
-/* Settings for big image in center */
-#image {
+#network_queue > thead > tr {
+	top: -1px;
+	position: sticky;
+	background-color: var(--dark-blue);
+	height: 2rem;
+}
+
+#network_queue td {
+	border: 1px solid black;
+	padding: 0.2rem 0.5rem;
+}
+
+#network_queue button {
+	width: 100%;
+}
+
+#network_queue_body > :nth-child(odd) { background-color: transparent; }
+#network_queue_body > :nth-child(even) { background-color: #ffffff22; }
+
+/*
+Tag-Tab Specific Settings
+*/
+
+#tag_search_string > * {
+	display: inline-block;
+	margin: 0 0.3rem;
+}
+
+#tag_rules_and_hotkeys {
+	flex-grow: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.tag_hotkey_button { min-width: 6rem; }
+.tag_rule_button { min-width: 2rem; }
+
+#tag_main {
 	display:flex;
-	overflow: hidden;
+	align-items: center;
+	justify-content: center;
 }
-#image > * {
+
+#tag_main > * {
 	max-width: 90%;
 	max-height: 90%;
-	margin: auto;
-	align-self: center;
 }
 
-#image[data-file_type="swf"] {
-	border: 10px solid #39a;
+/*
+Tag-Tab Left Posts Sidebar
+*/
+#post_list {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	overflow: auto;
 }
-#image[data-file_type="webm"] {
-	border: 10px solid #9fa;
+
+#tag_sidebar.tag_search_loading {
+	background-color: #ff330077;
 }
 
+.post_small {
+	border: 1px solid white;
+	margin: 0.5rem;
+	padding: 0.3rem;
+	width: 10rem;
+	height: 10rem;
+	min-height: 10rem;
+	min-width: 10rem;
 
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
-/* Search bar */
-#search {
-	align-self: baseline;
-	width: 95%;
+.post_small > img {
+	max-height: 10rem;
+	max-width: 10rem;
+}
+
+.post_visited {
+	background-color: var(--light-yellow);
 }
